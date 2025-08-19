@@ -1,1 +1,119 @@
-s
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Country</title>
+  <style>
+    /* Random CSS class names */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+
+    .bgWrap_abx91 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .bgWrap_abx91::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200%;
+      background: url('https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/images/walk.jpg') repeat-y center/cover;
+      animation: scroll_abx91 20s linear infinite;
+      filter: grayscale(100%);
+    }
+
+    @keyframes scroll_abx91 {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+
+    .content_abx91 {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.5); /* slight overlay for readability */
+      color: white;
+    }
+
+    .dropdown_abx91 {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      margin-bottom: 20px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .button_abx91 {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: not-allowed;
+      background: gray;
+      color: white;
+      transition: background 0.3s ease, cursor 0.3s ease;
+    }
+
+    .button_abx91.enabled {
+      background: #28a745;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="bgWrap_abx91"></div>
+
+  <div class="content_abx91">
+    <h2>Select Country</h2>
+    <select id="countrySelect" class="dropdown_abx91">
+      <option value="">-- Select Country --</option>
+      <option value="https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">INDIA</option>
+      <option value="https://bbfvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">BANGLADESH</option>
+    </select>
+
+    <button id="startBtn" class="button_abx91" disabled>Let's Start</button>
+  </div>
+
+  <script>
+    const select = document.getElementById("countrySelect");
+    const startBtn = document.getElementById("startBtn");
+
+    select.addEventListener("change", function() {
+      if (this.value) {
+        startBtn.disabled = false;
+        startBtn.classList.add("enabled");
+      } else {
+        startBtn.disabled = true;
+        startBtn.classList.remove("enabled");
+      }
+    });
+
+    startBtn.addEventListener("click", function() {
+      const url = select.value;
+      if (url) {
+        window.location.href = url;
+      }
+    });
+  </script>
+</body>
+</html>
