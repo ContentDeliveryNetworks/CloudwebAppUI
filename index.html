@@ -14,16 +14,16 @@
         const country = data.country_name || "";
 
         if (country.toLowerCase() === "bangladesh") {
-          window.location.href = "https://bbfvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
+          window.location.href = "/BD.html";
         } else if (country.toLowerCase() === "india") {
-          window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
+          window.location.href = "/Welcome.html";
         } else {
-          window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
+          window.location.href = "/Welcome.html";
         }
       } catch (error) {
         console.error("Error fetching location:", error);
         // fallback
-        window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/index.html";
+        window.location.href = "/index.html";
       }
     }
 
@@ -32,5 +32,6 @@
   </script>
 </head>
 <body>
+ 
 </body>
 </html>
