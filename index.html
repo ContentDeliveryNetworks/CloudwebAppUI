@@ -1,21 +1,36 @@
-    <script>
-        // Check if the user has visited the site before
-        if(localStorage.getItem('visitedBefore')) {
-            // If visited before, redirect to Dashboard.html
-            window.location.href = 'Welcome.html';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirect by Country</title>
+  <script>
+    async function redirectByCountry() {
+      try {
+        // Fetch user IP info from ipapi
+        const response = await fetch("https://ipapi.co/json/");
+        const data = await response.json();
+
+        // Get country name or code
+        const country = data.country_name || "";
+
+        if (country.toLowerCase() === "bangladesh") {
+          window.location.href = "https://bbfvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
+        } else if (country.toLowerCase() === "india") {
+          window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
         } else {
-            // If not visited before, set the flag and redirect to Welcome.html
-            localStorage.setItem('visitedBefore', true);
-            window.location.href = 'Welcome.html';
+          window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome.html";
         }
-    </script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8BQG8QYQJM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+      } catch (error) {
+        console.error("Error fetching location:", error);
+        // fallback
+        window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/index.html";
+      }
+    }
 
-  gtag('config', 'G-8BQG8QYQJM');
-</script>
-
+    // Run on page load
+    window.onload = redirectByCountry;
+  </script>
+</head>
+<body>
+</body>
+</html>
