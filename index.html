@@ -5,93 +5,136 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Select Country</title>
   <style>
-    /* Random CSS class names */
+    /* Reset & base */
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: Arial, sans-serif;
+      font-family: "Poppins", sans-serif;
     }
 
-    .bgWrap_abx91 {
+    /* Background */
+    .bgWrap_qz88 {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       overflow: hidden;
       z-index: -1;
     }
 
-    .bgWrap_abx91::before {
+    .bgWrap_qz88::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 200%;
+      top: 0; left: 0;
+      width: 100%; height: 200%;
       background: url('https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/images/walk.jpg') repeat-y center/cover;
-      animation: scroll_abx91 20s linear infinite;
+      animation: scroll_qz88 25s linear infinite;
       filter: grayscale(100%);
     }
 
-    @keyframes scroll_abx91 {
+    @keyframes scroll_qz88 {
       0% { transform: translateY(0); }
       100% { transform: translateY(-50%); }
     }
 
-    .content_abx91 {
+    /* Content Card */
+    .card_qz88 {
       position: relative;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100%;
-      text-align: center;
       padding: 20px;
-      background: rgba(0, 0, 0, 0.5); /* slight overlay for readability */
+      background: rgba(0, 0, 0, 0.55);
       color: white;
+      text-align: center;
     }
 
-    .dropdown_abx91 {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
+    .box_qz88 {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 30px 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      animation: fadeIn_qz88 1s ease-out;
+    }
+
+    @keyframes fadeIn_qz88 {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .title_qz88 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    /* Dropdown */
+    .dropdown_qz88 {
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px solid #ccc;
       font-size: 16px;
       margin-bottom: 20px;
-      width: 80%;
-      max-width: 300px;
+      width: 100%;
+      background: linear-gradient(to right, #f9f9f9, #f1f1f1);
+      transition: border 0.3s ease;
+    }
+    .dropdown_qz88:focus {
+      border-color: #007bff;
+      outline: none;
     }
 
-    .button_abx91 {
-      padding: 12px 24px;
+    /* Button */
+    .button_qz88 {
+      padding: 14px;
+      width: 100%;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 18px;
-      cursor: not-allowed;
+      font-weight: bold;
       background: gray;
       color: white;
-      transition: background 0.3s ease, cursor 0.3s ease;
+      cursor: not-allowed;
+      transition: background 0.4s ease, transform 0.2s ease;
     }
 
-    .button_abx91.enabled {
-      background: #28a745;
+    .button_qz88.enabled {
+      background: linear-gradient(45deg, #ff6b6b, #f94d6a, #f9a825, #42a5f5);
+      background-size: 300% 300%;
+      animation: gradient_qz88 5s ease infinite;
       cursor: pointer;
+    }
+
+    .button_qz88.enabled:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes gradient_qz88 {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
   </style>
 </head>
 <body>
-  <div class="bgWrap_abx91"></div>
+  <div class="bgWrap_qz88"></div>
 
-  <div class="content_abx91">
-    <h2>Select Country</h2>
-    <select id="countrySelect" class="dropdown_abx91">
-      <option value="">-- Select Country --</option>
-      <option value="https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">INDIA</option>
-      <option value="https://bbfvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">BANGLADESH</option>
-    </select>
+  <div class="card_qz88">
+    <div class="box_qz88">
+      <h2 class="title_qz88">🌍 Select Your Country</h2>
+      <select id="countrySelect" class="dropdown_qz88">
+        <option value="">-- Choose One --</option>
+        <option value="https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">🇮🇳 INDIA</option>
+        <option value="https://bbfvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">🇧🇩 BANGLADESH</option>
+      </select>
 
-    <button id="startBtn" class="button_abx91" disabled>Let's Start</button>
+      <button id="startBtn" class="button_qz88" disabled>🚀 Let's Start</button>
+    </div>
   </div>
 
   <script>
