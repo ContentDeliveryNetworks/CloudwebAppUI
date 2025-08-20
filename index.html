@@ -141,6 +141,12 @@
     const select = document.getElementById("countrySelect");
     const startBtn = document.getElementById("startBtn");
 
+    // Check if user already selected a country before
+    const savedUrl = localStorage.getItem("selectedCountry");
+    if (savedUrl) {
+      window.location.href = savedUrl;
+    }
+
     select.addEventListener("change", function() {
       if (this.value) {
         startBtn.disabled = false;
@@ -154,6 +160,7 @@
     startBtn.addEventListener("click", function() {
       const url = select.value;
       if (url) {
+        localStorage.setItem("selectedCountry", url); // Save choice
         window.location.href = url;
       }
     });
