@@ -147,7 +147,6 @@
 
 </style>
 
-
 <script>
 // Chat elements
 const chatContent = document.querySelector('.content');
@@ -159,25 +158,46 @@ const sendSound = new Audio('./UserClient/Sending.mp3');
 const notifySound = new Audio('./UserClient/Notification.mp3');
 const typingSound = new Audio('./UserClient/Typing.mp3');
 
+// Safe audio play
+function safePlay(audio) {
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play().catch(err => console.log("Audio blocked:", err.message));
+}
+
 // Unique user ID
-let userID = localStorage.getItem('chatUserID');
-if (!userID) {
-    userID = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-    localStorage.setItem('chatUserID', userID);
+let userID;
+try {
+    userID = localStorage.getItem('chatUserID');
+    if (!userID) {
+        userID = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+        localStorage.setItem('chatUserID', userID);
+    }
+} catch(e) {
+    console.warn("LocalStorage blocked:", e);
+    userID = 'user_' + Date.now();
 }
 const storageKey = 'chatHistory_' + userID;
 
 // Restore chat
 window.addEventListener('load', () => {
-    const savedChat = localStorage.getItem(storageKey);
-    if (savedChat) chatContent.innerHTML = savedChat;
+    try {
+        const savedChat = localStorage.getItem(storageKey);
+        if (savedChat) chatContent.innerHTML = savedChat;
+    } catch (e) {
+        console.warn("Cannot restore chat:", e);
+    }
     scrollToBottom();
     inputField.focus();
 });
 
-// Scroll to bottom
+// Scroll to bottom with fallback
 function scrollToBottom() {
-    chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' });
+    try {
+        chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' });
+    } catch {
+        chatContent.scrollTop = chatContent.scrollHeight;
+    }
 }
 
 // Add message
@@ -196,13 +216,17 @@ function addMessage(message, sender = 'user') {
     saveChat();
     scrollToBottom();
 
-    if (sender === 'user') sendSound.play();
-    else notifySound.play();
+    if (sender === 'user') safePlay(sendSound);
+    else safePlay(notifySound);
 }
 
-// Save chat
+// Save chat safely
 function saveChat() {
-    localStorage.setItem(storageKey, chatContent.innerHTML);
+    try {
+        localStorage.setItem(storageKey, chatContent.innerHTML);
+    } catch (e) {
+        console.warn("LocalStorage blocked:", e);
+    }
 }
 
 // Get IST time
@@ -223,6 +247,7 @@ let botBusy = false;
 let typingDiv = null;
 let typingInterval = null;
 
+// Typing animation
 function animateTypingDots() {
     if (!typingDiv) return;
     let dots = 0;
@@ -232,6 +257,7 @@ function animateTypingDots() {
     }, 500);
 }
 
+// Stop typing
 function stopTypingAnimation() {
     if (typingInterval) clearInterval(typingInterval);
     typingInterval = null;
@@ -241,6 +267,7 @@ function stopTypingAnimation() {
     }
 }
 
+// Process bot messages
 function processBotQueue() {
     if (botBusy || botQueue.length === 0) return;
     botBusy = true;
@@ -264,7 +291,7 @@ function processBotQueue() {
 
         const scrollInterval = setInterval(scrollToBottom, 200);
         typingSound.loop = true;
-        typingSound.play();
+        safePlay(typingSound);
 
         // Keep typing for 8 seconds
         setTimeout(() => {
@@ -299,6 +326,7 @@ function processBotQueue() {
     }, 5000);
 }
 
+// Push message to bot
 function botResponse(message) {
     botQueue.push(message);
     processBotQueue();
@@ -323,6 +351,13 @@ inputField.addEventListener('keydown', (e) => {
 });
 inputField.addEventListener('keyup', (e) => {
     if (e.key === 'Enter' || e.keyCode === 13) e.preventDefault();
+});
+// Android IME fallback for Enter key
+inputField.addEventListener('input', (e) => {
+    if (e.inputType === "insertLineBreak") {
+        e.preventDefault();
+        sendMessage();
+    }
 });
 </script>
 
