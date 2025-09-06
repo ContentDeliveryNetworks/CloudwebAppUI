@@ -65,6 +65,28 @@
     .register { background: #4caf50; } /* green */
     .paid { background: #2196f3; }     /* blue */
     .due { background: #f44336; }      /* red */
+
+    .pay-button {
+      margin-top: 25px;
+      display: inline-block;
+      padding: 15px 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: #ff9500;
+      border: none;
+      border-radius: 15px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .pay-button:hover {
+      background: #e08900;
+    }
+
+    .pay-button:active {
+      background: #b36c00;
+    }
   </style>
 </head>
 <body>
@@ -85,6 +107,9 @@
     <div class="divider"></div>
 
     <div id="dueInfo">Loading due amount...</div>
+
+    <!-- Pay Due Amount Button -->
+    <a href="https://himanpayment2checkout.pages.dev/Contact" class="pay-button">Pay Due Amount</a>
   </div>
 
   <script>
