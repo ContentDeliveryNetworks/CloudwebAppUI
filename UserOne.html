@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congratulations</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1.congrats-heading {
+      font-size: clamp(1.4rem, 5vw, 1.8rem);
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-align: center;
+      background: red;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInScale 0.8s forwards, gradientShift 5s ease infinite;
+      opacity: 0;
+      transform: scale(0.8);
+      background-size: 400% 400%;
+    }
+
+    .profile-box {
+      width: clamp(100px, 30vw, 150px);
+      height: clamp(100px, 30vw, 150px);
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #007aff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 40px;
+      position: relative;
+      opacity: 0;
+      transform: scale(0.8);
+      animation: fadeInScale 0.8s forwards;
+      animation-delay: 0.5s;
+    }
+
+    .profile-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Sparkle effect */
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 0 8px 2px #fff;
+      animation: sparkleAnim 0.8s forwards;
+    }
+
+    @keyframes sparkleAnim {
+      0% { transform: scale(0.2) translate(0,0); opacity: 1; }
+      50% { transform: scale(1.2) translate(20px, -20px); opacity: 1; }
+      100% { transform: scale(0) translate(40px, -40px); opacity: 0; }
+    }
+
+    .btn-continue {
+      padding: clamp(12px, 4vw, 16px) 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: clamp(1rem, 4vw, 1.1rem);
+      font-weight: 500;
+      background: #007aff;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: background 0.3s ease, transform 0.3s ease;
+      min-width: 150px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s forwards;
+      animation-delay: 1s;
+    }
+
+    .btn-continue:hover {
+      background: #006ae6;
+      transform: translateY(-2px);
+    }
+
+    /* Animations */
+    @keyframes fadeInScale {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Confetti styles */
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      top: 0;
+      pointer-events: none;
+      opacity: 0.7;
+      z-index: 999;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="congrats-heading">Congratulations, Mr. Krisna! Your Profile Is Ready</h1>
+
+  <!-- Profile Circle -->
+  <div class="profile-box" id="profileBox">
+    <img src="https://via.placeholder.com/150" alt="Profile Picture">
+  </div>
+
+  <!-- Continue Button -->
+  <button class="btn-continue" onclick="window.location.href='https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/UserTwo'">
+    Continue
+  </button>
+
+  <!-- Celebration sound -->
+  <audio id="celebrationSound" src="https://www.myinstants.com/media/sounds/tada-fanfare.mp3"></audio>
+
+  <script>
+    // Confetti animation
+    function createConfetti() {
+      const colors = ['#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#5856d6'];
+      const count = 100;
+
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.width = confetti.style.height = (Math.random() * 8 + 5) + 'px';
+        document.body.appendChild(confetti);
+
+        const fall = () => {
+          const duration = Math.random() * 2000 + 2000;
+          confetti.animate([
+            { transform: `translateY(0px) rotate(0deg)`, opacity: 1 },
+            { transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random()*720}deg)`, opacity: 0 }
+          ], {
+            duration: duration,
+            easing: 'linear',
+            iterations: 1,
+            fill: 'forwards'
+          });
+          setTimeout(() => confetti.remove(), duration);
+        };
+        fall();
+      }
+    }
+
+    // Sparkle animation
+    function createSparkle() {
+      const profile = document.getElementById('profileBox');
+      const sparkleCount = 20;
+
+      for (let i = 0; i < sparkleCount; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.classList.add('sparkle');
+        profile.appendChild(sparkle);
+        const delay = i * 100;
+        setTimeout(() => {
+          sparkle.style.left = Math.random() * profile.offsetWidth + 'px';
+          sparkle.style.top = Math.random() * profile.offsetHeight + 'px';
+          sparkle.style.opacity = 1;
+          sparkle.style.animation = `sparkleAnim 0.8s forwards`;
+          setTimeout(() => sparkle.remove(), 800);
+        }, delay);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      // Play sound
+      const sound = document.getElementById('celebrationSound');
+      sound.play().catch(e => console.log('Sound play blocked:', e));
+
+      createConfetti();
+      createSparkle();
+    });
+  </script>
+
+</body>
+</html>
