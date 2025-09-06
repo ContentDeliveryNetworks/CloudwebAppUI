@@ -6863,7 +6863,12 @@ input[type=number] {
 .bg-7 {
   background-image: url(../images/pictures/7.jpg);
 }
-
+.clientx {
+  background-image: url(../UserClient/1x.jpg);
+}
+.user {
+  background-image: url(../krisna.jpg);
+}
 .bg-8 {
   background-image: url(../images/pictures/8.html);
 }
