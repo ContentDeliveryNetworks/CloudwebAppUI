@@ -1,0 +1,350 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<!-- Mirrored from callboy.neocities.org/Application/ChatClient by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 23 Jan 2025 23:15:21 GMT -->
+<head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8BQG8QYQJM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8BQG8QYQJM');
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>Demo Message</title>
+<link rel="stylesheet" type="text/css" href="styles/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="styles/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="fonts/css/fontawesome-all.min.css">    
+<link rel="manifest" href="_manifest.json" data-pwa-version="set_in_manifest_and_pwa_js">
+<link rel="apple-touch-icon" sizes="180x180" href="app/icons/icon-192x192.html">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+    
+<body class="theme-light">
+    
+<div id="preloader"><div class="spinner-border color-highlight" role="status"></div></div>
+    
+<div id="page">
+    
+    <div class="header header-fixed header-logo-center header-auto-show">
+        <a href="#" class="header-title">Chat</a>
+        <a href="#" data-back-button class="header-icon header-icon-1"><i class="fas fa-chevron-left"></i></a>
+        <a href="#" data-menu="menu-main" class="header-icon header-icon-4"><i class="fas fa-bars"></i></a>
+        <a href="#"  class="header-icon header-icon-2"><i class="fa-solid fa-video"></i></a>
+        <a href="#" class="header-icon header-icon-3"><i class="fa-solid fa-phone fa-rotate-90"></i></a>
+    </div>
+
+    <div id="footer-bar" class="d-flex">
+        <div class="me-3 speach-icon">
+            <a href="#" data-menu="menu-upload" class="bg-gray-dark ms-2"><i class="fa fa-plus pt-2"></i></a>
+        </div>
+        <div class="flex-fill speach-input">
+            <input type="text" class="form-control" placeholder="Enter your Message here">
+        </div>
+        <div class="ms-3 speach-icon">
+            <a href="#" class="gradient-highlight color-white me-2" data-toast="snackbar"><i class="fa fa-arrow-up pt-2"></i></a>
+        </div>
+    </div>
+    
+    <div class="page-title page-title-fixed">
+        <h1>Chat</h1>
+        <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-light" data-toggle-theme><i class="fa fa-moon"></i></a>
+        <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-dark" data-toggle-theme><i class="fa fa-lightbulb color-yellow-dark"></i></a>
+        <a href="#" data-toast="snackbar" class="page-title-icon shadow-xl bg-theme color-theme"><i class="fa-solid fa-ban" style="color: #ed0707;"></i></a>
+        <a href="#" class="page-title-icon shadow-xl bg-theme color-theme" data-menu="menu-main"><i class="fa fa-bars"></i></a>
+
+    </div>
+    <div class="page-title-clear"></div>
+        
+    <div class="page-content">
+   
+        <div class="content mt-0 mb-n5">
+
+
+    </div>
+
+
+    <style>/* Chat container */
+.content {
+    overflow-y: auto;
+    max-height: calc(100vh - 98px); /* Adjust input height */
+    padding: 10px 10px 120px 10px; /* Extra bottom padding for last message + timestamp */
+}
+
+
+
+/* Typing dots animation */
+.typing-dot {
+  display: inline-block;
+  font-weight: bold;
+  animation: blink 1s infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+
+</style>
+
+
+<script>
+// Chat elements
+const chatContent = document.querySelector('.content');
+const inputField = document.querySelector('.speach-input input');
+const sendBtn = document.querySelector('#footer-bar a[data-toast]');
+
+// Sounds
+const sendSound = new Audio('./UserClient/Sending.mp3'); // user message sent
+const notifySound = new Audio('./UserClient/Notification.mp3'); // bot reply
+const typingSound = new Audio('./UserClient/Typing.mp3'); // typing sound
+
+// Generate or get unique user ID
+let userID = localStorage.getItem('chatUserID');
+if(!userID){
+    userID = 'user_' + Date.now() + '_' + Math.floor(Math.random()*10000);
+    localStorage.setItem('chatUserID', userID);
+}
+
+// Key for localStorage
+const storageKey = 'chatHistory_' + userID;
+
+// Restore chat from localStorage
+window.addEventListener('load', () => {
+    const savedChat = localStorage.getItem(storageKey);
+    if(savedChat) chatContent.innerHTML = savedChat;
+    scrollToBottom();
+});
+
+// Scroll to bottom smoothly
+function scrollToBottom() {
+    chatContent.scrollTo({
+        top: chatContent.scrollHeight,
+        behavior: 'smooth'
+    });
+}
+
+// Add message function
+function addMessage(message, sender='user') {
+    const div = document.createElement('div');
+    div.classList.add('speech-bubble');
+    if(sender === 'user') div.classList.add('speech-last','speech-left','bg-highlight');
+    else div.classList.add('speech-right','color-black');
+    div.textContent = message;
+
+    chatContent.appendChild(div);
+
+    const clearDiv = document.createElement('div');
+    clearDiv.classList.add('clearfix');
+    chatContent.appendChild(clearDiv);
+
+    saveChat();
+    scrollToBottom();
+
+    // Play sound
+    if(sender==='user') sendSound.play();
+    else notifySound.play();
+}
+
+// Save chat to localStorage
+function saveChat() {
+    localStorage.setItem(storageKey, chatContent.innerHTML);
+}
+
+// Get India Time
+function getIndiaTime() {
+    const now = new Date();
+    const istTime = new Date(now.getTime() + (330 + now.getTimezoneOffset())*60000);
+    let hours = istTime.getHours();
+    let minutes = istTime.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    return hours + ':' + minutes + ' ' + ampm;
+}
+
+// Bot queue to handle multiple messages
+const botQueue = [];
+let botBusy = false;
+let typingDiv = null;
+let typingInterval = null;
+
+function animateTypingDots() {
+    if(!typingDiv) return;
+    let dots = 0;
+    typingInterval = setInterval(() => {
+        dots = (dots + 1) % 4; // 0 to 3 dots
+        const textNode = typingDiv.firstChild;
+        textNode.textContent = 'Divya Joshi is Typing' + '.'.repeat(dots);
+    }, 500);
+}
+
+function stopTypingAnimation() {
+    if(typingInterval) clearInterval(typingInterval);
+    typingInterval = null;
+    if(typingDiv){
+        typingDiv.remove();
+        typingDiv = null;
+    }
+}
+
+// Process bot queue
+function processBotQueue() {
+    if(botBusy || botQueue.length === 0) return;
+    botBusy = true;
+
+    const message = botQueue.shift();
+
+    // 5-second pause before typing indicator
+    setTimeout(() => {
+        // Show typing indicator (only one at a time)
+        if(!typingDiv) {
+            typingDiv = document.createElement('div');
+            typingDiv.classList.add('speech-bubble','speech-right','color-black');
+            typingDiv.appendChild(document.createTextNode('Divya Joshi is Typing'));
+            chatContent.appendChild(typingDiv);
+
+            const clearDiv = document.createElement('div');
+            clearDiv.classList.add('clearfix');
+            chatContent.appendChild(clearDiv);
+
+            // Start dynamic typing dots
+            animateTypingDots();
+        }
+
+        // Smooth scroll while typing
+        const scrollInterval = setInterval(scrollToBottom, 100);
+
+        // Play typing sound
+        typingSound.loop = true;
+        typingSound.play();
+
+        // Fixed 3-second typing duration
+        setTimeout(() => {
+            clearInterval(scrollInterval);
+            stopTypingAnimation();
+            typingSound.pause();
+            typingSound.currentTime = 0;
+
+            // Demo keywords
+            let reply = "Sorry, I didn't understand that.";
+            const msg = message.toLowerCase();
+            const keywords = [
+                {keys:['hi','hello','hey'], reply:'Hello! How are you today?'},
+                {keys:['time','current time'], reply:'Current IST time is '+getIndiaTime()},
+                {keys:['bye','goodbye'], reply:'Goodbye! Have a nice day!'},
+
+                 {keys:['Style','style'], reply:'Goodbye! Have a nice day!'},
+
+ {keys:['doggy','goodbye'], reply:'I love to doggi'},
+
+                {keys:['how are you'], reply:'I am just a bot, but doing great!'},
+                {keys:['your name','who are you'], reply:'I am Divya Joshi'},
+                {keys:['meeting','meet'], reply:'Sure! When would you like to meet?'},
+                {keys:['demo','sample'], reply:'This is a demo bot showing example keywords.'},
+                {keys:['thanks','thank you'], reply:'You are welcome! 😊'},
+                {keys:['help','support'], reply:'I can assist you with using this demo.'},
+                {keys:['services','offerings'], reply:'We provide multiple services including chat demo, user management, and more.'},
+            ];
+
+            for(let k of keywords){
+                for(let word of k.keys){
+                    if(msg.includes(word)){
+                        reply = k.reply;
+                        break;
+                    }
+                }
+            }
+
+            addMessage(reply,'bot');
+            botBusy = false;
+            processBotQueue(); // Process next message in queue
+        }, 10000); // fixed 3-second typing
+
+    }, 7000); // 5-second pause before showing typing
+}
+
+function botResponse(message) {
+    botQueue.push(message);
+    processBotQueue();
+}
+
+// Send message
+function sendMessage() {
+    const message = inputField.value.trim();
+    if(!message) return;
+    addMessage(message,'user');
+    inputField.value = '';
+    botResponse(message);
+}
+
+// Event listeners
+sendBtn.addEventListener('click', sendMessage);
+inputField.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') sendMessage();
+});
+
+</script>
+
+
+    <div id="menu-upload" 
+         class="menu menu-box-bottom rounded-m" 
+         data-menu-height="275" 
+         data-menu-effect="menu-over">
+        <div class="list-group list-custom-small ps-2 me-4">
+            <a href="#">
+                <i class="font-14 fa fa-file color-gray2-dark"></i>
+                <span class="font-13">File</span>
+                <i class="fa fa-angle-right"></i>
+            </a>
+            <a href="#">
+                <i class="font-14 fa fa-image color-gray2-dark"></i>
+                <span class="font-13">Photo</span>
+                <i class="fa fa-angle-right"></i>
+            </a>
+            <a href="#">
+                <i class="font-14 fa fa-video color-gray2-dark"></i>
+                <span class="font-13">Video</span>
+                <i class="fa fa-angle-right"></i>
+            </a>
+            <a href="#">
+                <i class="font-14 fa fa-user color-gray2-dark"></i>
+                <span class="font-13">Camera</span>
+                <i class="fa fa-angle-right"></i>
+            </a>  
+            <a href="#">
+                <i class="font-14 fa fa-map-marker color-gray2-dark"></i>
+                <span class="font-13">Location</span>
+                <i class="fa fa-angle-right"></i>
+            </a>  
+        </div>
+    </div> 
+    
+    
+    <!-- Main Menu--> 
+    <div id="menu-main" class="menu menu-box-left rounded-0" data-menu-load="menu-main.html" data-menu-width="280" data-menu-active="nav-pages"></div>
+    
+
+    
+
+
+   
+
+    
+</div>
+
+    
+<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+<script type="text/javascript" src="scripts/custom.js"></script>
+</body>
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirect Based on Last Visit</title>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const lastVisit = localStorage.getItem('lastVisit');
+    const now = new Date().getTime(); // current timestamp in ms
+
+    if (lastVisit) {
+      const diff = now - parseInt(lastVisit, 10); // difference in ms
+      if (diff < 15000) {
+        // Less than 15 seconds ago
+        window.location.href = './UserNoJobs.html';
+      } else {
+        // More than 15 seconds ago
+        window.location.href = './UserDashboard.html';
+      }
+    } else {
+      // First visit
+      window.location.href = './UserNoJobs.html';
+    }
+
+    // Update last visit timestamp in localStorage
+    localStorage.setItem('lastVisit', now);
+  });
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+</body>
+</html>
