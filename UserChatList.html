@@ -56,12 +56,14 @@
        spellcheck="false">
         </div>
         <div class="ms-3 speach-icon">
-            <a href="#" class="gradient-blue color-white me-2" id="sendBtn"><i class="fa fa-arrow-up pt-2"></i></a>
+            <button type="button" id="sendBtn" class="gradient-highlight color-white me-2">
+</button>
+
         </div>
     </div>
     
     <div class="page-title page-title-fixed">
-        <h1>Chat</h1>
+        <h1>Divya</h1>
         <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-light" data-toggle-theme><i class="fa fa-moon"></i></a>
         <a href="#" class="page-title-icon shadow-xl bg-theme color-theme show-on-theme-dark" data-toggle-theme><i class="fa fa-lightbulb color-yellow-dark"></i></a>
         <a href="#" data-toast="snackbar" class="page-title-icon shadow-xl bg-theme color-theme"><i class="fa-solid fa-ban" style="color: #ed0707;"></i></a>
@@ -77,7 +79,45 @@
 
     </div>
 
+<style>
+   .speech-bubble{
+  display:inline-block;
+  padding:10px 14px;
+  border-radius:18px;
+  margin:6px 0;
+  max-width:80%;
+  font-size:15px;
+  line-height:1.4;
+  word-wrap:break-word;
+  color:#fff;
+}
 
+/* BOT = LEFT side */
+.speech-left{
+  background:dodgerblue; /* blue/cyan */
+  float:left;
+  clear:both;
+  color:#fff;
+}
+
+/* YOU = RIGHT side */
+.speech-right{
+  background:red;
+  float:right;
+  clear:both;
+  color:#fff;
+}
+
+/* Typing bubble (bot) -> LEFT */
+.typing-bubble{
+  background:dodgerblue;
+  float:left;          /* bot is left */
+  clear:both;
+  color:white;
+}
+
+.clearfix{clear:both;}
+</style>
     <style>/* Chat container */
 .content {
     overflow-y: auto;
@@ -107,7 +147,7 @@
 
 
 
-   <script>
+    <script>
 // Chat elements
 const chatContent = document.querySelector('.content');
 const inputField = document.getElementById('chatInput');
@@ -120,13 +160,16 @@ const typingSound = new Audio('./UserClient/Typing.mp3');
 
 // Unique user ID
 let userID = localStorage.getItem('chatUserID');
-if (!userID) { userID = 'user_' + Date.now() + '_' + Math.floor(Math.random()*10000); localStorage.setItem('chatUserID', userID); }
+if (!userID) {
+    userID = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+    localStorage.setItem('chatUserID', userID);
+}
 const storageKey = 'chatHistory_' + userID;
 
 // Restore chat
 window.addEventListener('load', () => {
     const savedChat = localStorage.getItem(storageKey);
-    if(savedChat) chatContent.innerHTML = savedChat;
+    if (savedChat) chatContent.innerHTML = savedChat;
     scrollToBottom();
     inputField.focus();
 });
@@ -137,91 +180,149 @@ function scrollToBottom() {
 }
 
 // Add message
-function addMessage(message, sender='user') {
+function addMessage(message, sender = 'user') {
     const div = document.createElement('div');
     div.classList.add('speech-bubble');
-    if(sender==='user') div.classList.add('speech-left'); else div.classList.add('speech-right');
+    if (sender === 'user') div.classList.add('speech-right');
+    else div.classList.add('speech-left');
+
     div.textContent = message;
     chatContent.appendChild(div);
+
     const clearDiv = document.createElement('div');
     clearDiv.classList.add('clearfix');
     chatContent.appendChild(clearDiv);
+
     saveChat();
     scrollToBottom();
-    if(sender==='user') sendSound.play(); else notifySound.play();
+
+    if (sender === 'user') sendSound.play();
+    else notifySound.play();
 }
 
 // Save chat
-function saveChat() { localStorage.setItem(storageKey, chatContent.innerHTML); }
+function saveChat() {
+    localStorage.setItem(storageKey, chatContent.innerHTML);
+}
 
 // Get IST time
 function getIndiaTime() {
     const now = new Date();
-    const istTime = new Date(now.getTime() + (330 + now.getTimezoneOffset())*60000);
-    let hours = istTime.getHours(), minutes = istTime.getMinutes(), ampm = hours>=12?'PM':'AM';
-    hours = hours%12||12; minutes = minutes<10?'0'+minutes:minutes;
-    return hours+':'+minutes+' '+ampm;
+    const istTime = new Date(now.getTime() + (330 + now.getTimezoneOffset()) * 60000);
+    let hours = istTime.getHours(),
+        minutes = istTime.getMinutes(),
+        ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return hours + ':' + minutes + ' ' + ampm;
 }
 
 // Bot queue
-const botQueue = []; let botBusy = false; let typingDiv = null; let typingInterval = null;
+const botQueue = [];
+let botBusy = false;
+let typingDiv = null;
+let typingInterval = null;
 
 function animateTypingDots() {
-    if(!typingDiv) return;
-    let dots=0;
-    typingInterval = setInterval(()=>{
-        dots=(dots+1)%4;
-        typingDiv.firstChild.textContent='Divya Joshi is Typing'+'.'.repeat(dots);
-    },500);
+    if (!typingDiv) return;
+    let dots = 0;
+    typingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        typingDiv.firstChild.textContent = 'Divya Joshi is Typing' + '.'.repeat(dots);
+    }, 500);
 }
 
-function stopTypingAnimation() { if(typingInterval) clearInterval(typingInterval); typingInterval=null; if(typingDiv){ typingDiv.remove(); typingDiv=null; } }
+function stopTypingAnimation() {
+    if (typingInterval) clearInterval(typingInterval);
+    typingInterval = null;
+    if (typingDiv) {
+        typingDiv.remove();
+        typingDiv = null;
+    }
+}
 
 function processBotQueue() {
-    if(botBusy||botQueue.length===0) return; botBusy=true;
+    if (botBusy || botQueue.length === 0) return;
+    botBusy = true;
+
     const message = botQueue.shift();
-    setTimeout(()=>{
-        if(!typingDiv){
-            typingDiv=document.createElement('div');
-            typingDiv.classList.add('speech-bubble','speech-right');
+
+    // Wait 5s before typing starts
+    setTimeout(() => {
+        if (!typingDiv) {
+            typingDiv = document.createElement('div');
+            typingDiv.classList.add('speech-bubble', 'typing-bubble');
             typingDiv.appendChild(document.createTextNode('Divya Joshi is Typing'));
             chatContent.appendChild(typingDiv);
-            const clearDiv=document.createElement('div'); clearDiv.classList.add('clearfix'); chatContent.appendChild(clearDiv);
+
+            const clearDiv = document.createElement('div');
+            clearDiv.classList.add('clearfix');
+            chatContent.appendChild(clearDiv);
+
             animateTypingDots();
         }
-        const scrollInterval=setInterval(scrollToBottom,100);
-        typingSound.loop=true; typingSound.play();
-        setTimeout(()=>{
-            clearInterval(scrollInterval); stopTypingAnimation(); typingSound.pause(); typingSound.currentTime=0;
-            let reply="Sorry, I didn't understand that.";
-            const msg=message.toLowerCase();
-            const keywords=[
-                { keys:['hi','hello','hey'], reply:'Hello! How are you today?' },
-                { keys:['time','current time'], reply:'Current IST time is '+getIndiaTime() },
-                { keys:['bye','goodbye'], reply:'Goodbye! Have a nice day!' },
-                { keys:['how are you'], reply:'I am just a bot, but doing great!' },
-                { keys:['your name','who are you'], reply:'I am Divya Joshi' },
-                { keys:['demo','sample'], reply:'This is a demo bot showing example keywords.' }
+
+        const scrollInterval = setInterval(scrollToBottom, 200);
+        typingSound.loop = true;
+        typingSound.play();
+
+        // Keep typing for 8 seconds
+        setTimeout(() => {
+            clearInterval(scrollInterval);
+            stopTypingAnimation();
+            typingSound.pause();
+            typingSound.currentTime = 0;
+
+            // Default reply
+            let reply = "Sorry, I didn't understand that.";
+            const msg = message.toLowerCase();
+            const keywords = [
+                { keys: ['hi', 'hello', 'hey'], reply: 'Hello! How are you today?' },
+                { keys: ['time', 'current time'], reply: 'Current IST time is ' + getIndiaTime() },
+                { keys: ['bye', 'goodbye'], reply: 'Goodbye! Have a nice day!' },
+                { keys: ['how are you'], reply: 'I am just a bot, but doing great!' },
+                { keys: ['your name', 'who are you'], reply: 'I am Divya Joshi' },
+                { keys: ['demo', 'sample'], reply: 'This is a demo bot showing example keywords.' }
             ];
-            for(let k of keywords){ for(let w of k.keys){ if(msg.includes(w)){ reply=k.reply; break; } } }
-            addMessage(reply,'bot'); botBusy=false; processBotQueue();
-        },3000);
-    },1000);
+
+            for (let k of keywords) {
+                for (let w of k.keys) {
+                    if (msg.includes(w)) { reply = k.reply; break; }
+                }
+            }
+
+            addMessage(reply, 'bot');
+            botBusy = false;
+            processBotQueue();
+        }, 8000); // typing lasts 8 seconds
+
+    }, 5000); // wait 5 seconds before typing
 }
 
-function botResponse(message){ botQueue.push(message); processBotQueue(); }
+function botResponse(message) {
+    botQueue.push(message);
+    processBotQueue();
+}
 
 // Send message
 function sendMessage() {
-    const message = inputField.value.trim(); if(!message) return;
-    addMessage(message,'user'); inputField.value='';
+    const message = inputField.value.trim();
+    if (!message) return;
+    addMessage(message, 'user');
+    inputField.value = '';
     botResponse(message);
 }
 
 // Event listeners
 sendBtn.addEventListener('click', sendMessage);
-inputField.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.keyCode===13){ e.preventDefault(); sendMessage(); } });
+inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
 </script>
+
 
 
 
