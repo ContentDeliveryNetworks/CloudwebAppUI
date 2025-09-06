@@ -158,9 +158,16 @@ const sendSound = new Audio('./UserClient/Sending.mp3');
 const notifySound = new Audio('./UserClient/Notification.mp3');
 const typingSound = new Audio('./UserClient/Typing.mp3');
 
+// Detect mobile
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+// First user interaction enables audio
+let audioAllowed = false;
+document.addEventListener('click', () => { audioAllowed = true; }, { once: true });
+
 // Safe audio play
 function safePlay(audio) {
-    if (!audio) return;
+    if (!audio || !audioAllowed) return;
     audio.currentTime = 0;
     audio.play().catch(err => console.log("Audio blocked:", err.message));
 }
@@ -179,24 +186,37 @@ try {
 }
 const storageKey = 'chatHistory_' + userID;
 
+// In-memory fallback
+let memoryChat = '';
+
 // Restore chat
-window.addEventListener('load', () => {
+function loadChat() {
     try {
-        const savedChat = localStorage.getItem(storageKey);
-        if (savedChat) chatContent.innerHTML = savedChat;
-    } catch (e) {
-        console.warn("Cannot restore chat:", e);
+        const saved = localStorage.getItem(storageKey);
+        if (saved) chatContent.innerHTML = saved;
+        else if(memoryChat) chatContent.innerHTML = memoryChat;
+    } catch {
+        if(memoryChat) chatContent.innerHTML = memoryChat;
     }
     scrollToBottom();
+}
+window.addEventListener('load', () => {
+    loadChat();
     inputField.focus();
 });
 
 // Scroll to bottom with fallback
 function scrollToBottom() {
+    try { chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' }); }
+    catch { chatContent.scrollTop = chatContent.scrollHeight; }
+}
+
+// Save chat safely
+function saveChat() {
     try {
-        chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' });
+        localStorage.setItem(storageKey, chatContent.innerHTML);
     } catch {
-        chatContent.scrollTop = chatContent.scrollHeight;
+        memoryChat = chatContent.innerHTML;
     }
 }
 
@@ -218,15 +238,6 @@ function addMessage(message, sender = 'user') {
 
     if (sender === 'user') safePlay(sendSound);
     else safePlay(notifySound);
-}
-
-// Save chat safely
-function saveChat() {
-    try {
-        localStorage.setItem(storageKey, chatContent.innerHTML);
-    } catch (e) {
-        console.warn("LocalStorage blocked:", e);
-    }
 }
 
 // Get IST time
@@ -274,7 +285,10 @@ function processBotQueue() {
 
     const message = botQueue.shift();
 
-    // Wait 5s before typing starts
+    // Mobile-friendly typing delay
+    const typingDelay = isMobile ? 1000 : 5000;
+    const typingDuration = isMobile ? 2000 : 8000;
+
     setTimeout(() => {
         if (!typingDiv) {
             typingDiv = document.createElement('div');
@@ -293,7 +307,6 @@ function processBotQueue() {
         typingSound.loop = true;
         safePlay(typingSound);
 
-        // Keep typing for 8 seconds
         setTimeout(() => {
             clearInterval(scrollInterval);
             stopTypingAnimation();
@@ -321,9 +334,9 @@ function processBotQueue() {
             addMessage(reply, 'bot');
             botBusy = false;
             processBotQueue();
-        }, 8000);
+        }, typingDuration);
 
-    }, 5000);
+    }, typingDelay);
 }
 
 // Push message to bot
@@ -352,7 +365,6 @@ inputField.addEventListener('keydown', (e) => {
 inputField.addEventListener('keyup', (e) => {
     if (e.key === 'Enter' || e.keyCode === 13) e.preventDefault();
 });
-// Android IME fallback for Enter key
 inputField.addEventListener('input', (e) => {
     if (e.inputType === "insertLineBreak") {
         e.preventDefault();
