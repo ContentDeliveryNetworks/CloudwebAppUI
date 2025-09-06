@@ -56,8 +56,10 @@
        spellcheck="false">
         </div>
         <div class="ms-3 speach-icon">
-            <button type="button" id="sendBtn" class="gradient-highlight color-white me-2">
+   <button type="button" id="sendBtn" class="gradient-highlight color-white me-2">
+  Send
 </button>
+
 
         </div>
     </div>
@@ -146,8 +148,7 @@
 </style>
 
 
-
-    <script>
+<script>
 // Chat elements
 const chatContent = document.querySelector('.content');
 const inputField = document.getElementById('chatInput');
@@ -185,7 +186,6 @@ function addMessage(message, sender = 'user') {
     div.classList.add('speech-bubble');
     if (sender === 'user') div.classList.add('speech-right');
     else div.classList.add('speech-left');
-
     div.textContent = message;
     chatContent.appendChild(div);
 
@@ -294,9 +294,9 @@ function processBotQueue() {
             addMessage(reply, 'bot');
             botBusy = false;
             processBotQueue();
-        }, 8000); // typing lasts 8 seconds
+        }, 8000);
 
-    }, 5000); // wait 5 seconds before typing
+    }, 5000);
 }
 
 function botResponse(message) {
@@ -321,8 +321,10 @@ inputField.addEventListener('keydown', (e) => {
         sendMessage();
     }
 });
+inputField.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13) e.preventDefault();
+});
 </script>
-
 
 
 
