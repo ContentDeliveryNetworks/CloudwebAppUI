@@ -45,7 +45,15 @@
             <a href="#" data-menu="menu-upload" class="bg-gray-dark ms-2"><i class="fa fa-plus pt-2"></i></a>
         </div>
         <div class="flex-fill speach-input">
-            <input type="text" class="form-control" placeholder="Enter your Message here">
+            <input type="text" 
+       class="form-control" 
+       placeholder="Enter Message" 
+       id="chatInput" 
+       autocomplete="off" 
+       inputmode="text" 
+       autocorrect="off" 
+       autocapitalize="off" 
+       spellcheck="false">
         </div>
         <div class="ms-3 speach-icon">
             <a href="#" class="gradient-highlight color-white me-2" data-toast="snackbar"><i class="fa fa-arrow-up pt-2"></i></a>
@@ -99,9 +107,9 @@
 
 
 <script>
-// Chat elements
+    // Chat elements
 const chatContent = document.querySelector('.content');
-const inputField = document.querySelector('.speach-input input');
+const inputField = document.getElementById('chatInput'); // updated id
 const sendBtn = document.querySelector('#footer-bar a[data-toast]');
 
 // Sounds
@@ -111,8 +119,8 @@ const typingSound = new Audio('./UserClient/Typing.mp3'); // typing sound
 
 // Generate or get unique user ID
 let userID = localStorage.getItem('chatUserID');
-if(!userID){
-    userID = 'user_' + Date.now() + '_' + Math.floor(Math.random()*10000);
+if (!userID) {
+    userID = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     localStorage.setItem('chatUserID', userID);
 }
 
@@ -122,8 +130,9 @@ const storageKey = 'chatHistory_' + userID;
 // Restore chat from localStorage
 window.addEventListener('load', () => {
     const savedChat = localStorage.getItem(storageKey);
-    if(savedChat) chatContent.innerHTML = savedChat;
+    if (savedChat) chatContent.innerHTML = savedChat;
     scrollToBottom();
+    inputField.focus(); // auto-focus input on page load
 });
 
 // Scroll to bottom smoothly
@@ -135,11 +144,11 @@ function scrollToBottom() {
 }
 
 // Add message function
-function addMessage(message, sender='user') {
+function addMessage(message, sender = 'user') {
     const div = document.createElement('div');
     div.classList.add('speech-bubble');
-    if(sender === 'user') div.classList.add('speech-last','speech-left','bg-highlight');
-    else div.classList.add('speech-right','color-black');
+    if (sender === 'user') div.classList.add('speech-last', 'speech-left', 'bg-highlight');
+    else div.classList.add('speech-right', 'color-black');
     div.textContent = message;
 
     chatContent.appendChild(div);
@@ -152,7 +161,7 @@ function addMessage(message, sender='user') {
     scrollToBottom();
 
     // Play sound
-    if(sender==='user') sendSound.play();
+    if (sender === 'user') sendSound.play();
     else notifySound.play();
 }
 
@@ -164,12 +173,12 @@ function saveChat() {
 // Get India Time
 function getIndiaTime() {
     const now = new Date();
-    const istTime = new Date(now.getTime() + (330 + now.getTimezoneOffset())*60000);
+    const istTime = new Date(now.getTime() + (330 + now.getTimezoneOffset()) * 60000);
     let hours = istTime.getHours();
     let minutes = istTime.getMinutes();
     let ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12 || 12;
-    minutes = minutes < 10 ? '0'+minutes : minutes;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
     return hours + ':' + minutes + ' ' + ampm;
 }
 
@@ -180,7 +189,7 @@ let typingDiv = null;
 let typingInterval = null;
 
 function animateTypingDots() {
-    if(!typingDiv) return;
+    if (!typingDiv) return;
     let dots = 0;
     typingInterval = setInterval(() => {
         dots = (dots + 1) % 4; // 0 to 3 dots
@@ -190,9 +199,9 @@ function animateTypingDots() {
 }
 
 function stopTypingAnimation() {
-    if(typingInterval) clearInterval(typingInterval);
+    if (typingInterval) clearInterval(typingInterval);
     typingInterval = null;
-    if(typingDiv){
+    if (typingDiv) {
         typingDiv.remove();
         typingDiv = null;
     }
@@ -200,17 +209,17 @@ function stopTypingAnimation() {
 
 // Process bot queue
 function processBotQueue() {
-    if(botBusy || botQueue.length === 0) return;
+    if (botBusy || botQueue.length === 0) return;
     botBusy = true;
 
     const message = botQueue.shift();
 
     // 5-second pause before typing indicator
     setTimeout(() => {
-        // Show typing indicator (only one at a time)
-        if(!typingDiv) {
+        // Show typing indicator
+        if (!typingDiv) {
             typingDiv = document.createElement('div');
-            typingDiv.classList.add('speech-bubble','speech-right','color-black');
+            typingDiv.classList.add('speech-bubble', 'speech-right', 'color-black');
             typingDiv.appendChild(document.createTextNode('Divya Joshi is Typing'));
             chatContent.appendChild(typingDiv);
 
@@ -218,7 +227,6 @@ function processBotQueue() {
             clearDiv.classList.add('clearfix');
             chatContent.appendChild(clearDiv);
 
-            // Start dynamic typing dots
             animateTypingDots();
         }
 
@@ -236,42 +244,39 @@ function processBotQueue() {
             typingSound.pause();
             typingSound.currentTime = 0;
 
-            // Demo keywords
+            // Demo keyword-based replies
             let reply = "Sorry, I didn't understand that.";
             const msg = message.toLowerCase();
             const keywords = [
-                {keys:['hi','hello','hey'], reply:'Hello! How are you today?'},
-                {keys:['time','current time'], reply:'Current IST time is '+getIndiaTime()},
-                {keys:['bye','goodbye'], reply:'Goodbye! Have a nice day!'},
-
-                 {keys:['Style','style'], reply:'Goodbye! Have a nice day!'},
-
- {keys:['doggy','goodbye'], reply:'I love to doggi'},
-
-                {keys:['how are you'], reply:'I am just a bot, but doing great!'},
-                {keys:['your name','who are you'], reply:'I am Divya Joshi'},
-                {keys:['meeting','meet'], reply:'Sure! When would you like to meet?'},
-                {keys:['demo','sample'], reply:'This is a demo bot showing example keywords.'},
-                {keys:['thanks','thank you'], reply:'You are welcome! 😊'},
-                {keys:['help','support'], reply:'I can assist you with using this demo.'},
-                {keys:['services','offerings'], reply:'We provide multiple services including chat demo, user management, and more.'},
+                { keys: ['hi', 'hello', 'hey'], reply: 'Hello! How are you today?' },
+                { keys: ['time', 'current time'], reply: 'Current IST time is ' + getIndiaTime() },
+                { keys: ['bye', 'goodbye'], reply: 'Goodbye! Have a nice day!' },
+                { keys: ['style'], reply: 'I can show you style options.' },
+                { keys: ['doggy'], reply: 'I love doggy style!' },
+                { keys: ['how are you'], reply: 'I am just a bot, but doing great!' },
+                { keys: ['your name', 'who are you'], reply: 'I am Divya Joshi' },
+                { keys: ['meeting', 'meet'], reply: 'Sure! When would you like to meet?' },
+                { keys: ['demo', 'sample'], reply: 'This is a demo bot showing example keywords.' },
+                { keys: ['thanks', 'thank you'], reply: 'You are welcome! 😊' },
+                { keys: ['help', 'support'], reply: 'I can assist you with using this demo.' },
+                { keys: ['services', 'offerings'], reply: 'We provide multiple services including chat demo, user management, and more.' },
             ];
 
-            for(let k of keywords){
-                for(let word of k.keys){
-                    if(msg.includes(word)){
+            for (let k of keywords) {
+                for (let word of k.keys) {
+                    if (msg.includes(word)) {
                         reply = k.reply;
                         break;
                     }
                 }
             }
 
-            addMessage(reply,'bot');
+            addMessage(reply, 'bot');
             botBusy = false;
-            processBotQueue(); // Process next message in queue
-        }, 10000); // fixed 3-second typing
+            processBotQueue(); // Process next message
+        }, 3000); // typing duration
 
-    }, 7000); // 5-second pause before showing typing
+    }, 5000); // pause before typing
 }
 
 function botResponse(message) {
@@ -282,16 +287,21 @@ function botResponse(message) {
 // Send message
 function sendMessage() {
     const message = inputField.value.trim();
-    if(!message) return;
-    addMessage(message,'user');
+    if (!message) return;
+    addMessage(message, 'user');
     inputField.value = '';
     botResponse(message);
 }
 
 // Event listeners
 sendBtn.addEventListener('click', sendMessage);
+
+// Enter key support for mobile-friendly WebView/Android
 inputField.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') sendMessage();
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault(); // prevent line break
+        sendMessage();
+    }
 });
 
 </script>
