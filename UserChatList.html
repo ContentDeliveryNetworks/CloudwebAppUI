@@ -316,13 +316,17 @@ function processBotQueue() {
             let reply = "Sorry, I didn't understand that.";
             const msg = message.toLowerCase();
             const keywords = [
-                { keys: ['hi', 'hello', 'hey'], reply: 'Hello! How are you today?' },
-                { keys: ['time', 'current time'], reply: 'Current IST time is ' + getIndiaTime() },
-                { keys: ['bye', 'goodbye'], reply: 'Goodbye! Have a nice day!' },
-                { keys: ['how are you'], reply: 'I am just a bot, but doing great!' },
-                { keys: ['your name', 'who are you'], reply: 'I am Divya Joshi' },
-                { keys: ['demo', 'sample'], reply: 'This is a demo bot showing example keywords.' }
+               { keys: ['hi', 'hello', 'hey'], reply: ['I am feeling horny 😏, thanks for asking!', 'I am always horny 😈, what about you?'] },
+    { keys: ['oh', 'yep', 'okay'], reply: ['Yeah 😏'] },
+    { keys: ['online', 'here'], reply: ['Yes Krishna, I am online 👀'] },
+    { keys: ['question', 'ask', 'mind'], reply: ['Sure baby 😘'] },
+    { keys: ['sex position', 'style'], reply: ['I love doggy 😏, 69 🍆, Cowgirl 🍑, Cat 🐱, Lotus 🌸, Missionary ❤️, Reverse Cowgirl 🔥 and many more. But I have a question for you… what is the size of your 🍆?'] },
+    { keys: ['5','4','6','7','8','9','10','11','12'], reply: ['Wow 😍, I wanna suck it 😈'] },
+    { keys: ['when'], reply: ['Tomorrow night 😉'] },
+    { keys: ['where','meet','location','hotel'], reply: ['Already I booked a hotel near you 🏨. Hotel name: Ibis Chennai City Centre, Room B254, Lift Second Floor. Don’t worry 😏, I will pick you in front of the hotel.'] },
+    { keys: ['maps','link'], reply: ['Check google maps link https://maps.app.goo.gl/H12ZRjLr8yA5XSYS7'] }
             ];
+
 
             for (let k of keywords) {
                 for (let w of k.keys) {
@@ -424,5 +428,6 @@ inputField.addEventListener('input', (e) => {
 <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
 <script type="text/javascript" src="scripts/custom.js"></script>
 </body>
+
 
 
