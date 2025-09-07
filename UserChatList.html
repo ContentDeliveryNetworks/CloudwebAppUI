@@ -3,64 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Messenger Clone Async Multi-Flow Bot</title>
+<title>Messenger Bot</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Helvetica, Arial, sans-serif;}
-body {background:#000; height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; color:#fff;}
-.loading-screen {position:absolute; top:0; left:0; width:100%; height:100%; background:#111; display:flex; justify-content:center; align-items:center; z-index:1000; flex-direction:column; transition:opacity 0.5s ease;}
-.loading-screen.hidden {opacity:0; pointer-events:none;}
-.loader {width:50px; height:50px; border:5px solid #333; border-top:5px solid #00a2ff; border-radius:50%; animation:spin 1s linear infinite; margin-bottom:10px;}
-@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-.chat-container {width:360px; height:700px; background:#111; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.5); display:flex; flex-direction:column; overflow:hidden; display:none;}
-.chat-header {display:flex; align-items:center; padding:10px 15px; background:#1a1a1a; color:white; box-shadow:0 1px 2px rgba(0,0,0,0.5); position:relative; z-index:10;}
-.back-button {margin-right:10px; font-size:20px; cursor:pointer;}
-.avatar {width:40px; height:40px; border-radius:50%; overflow:hidden; margin-right:10px; border:2px solid #00a2ff;}
-.avatar img {width:100%; height:100%; object-fit:cover;}
-.user-info {flex:1;}
-.user-name {font-weight:600; font-size:16px;}
-.user-status {font-size:12px; opacity:0.7;}
-.header-icons {display:flex; gap:15px;}
-.header-icons i {font-size:18px; cursor:pointer;}
-.chat-messages {flex:1; padding:15px; overflow-y:auto; background:#000;}
-.date-separator {text-align:center; margin:15px 0; font-size:12px; color:#888; position:relative;}
-.date-separator:before {content:""; position:absolute; left:0; top:50%; right:0; height:1px; background:#333; z-index:1;}
-.date-separator span {background:#000; padding:0 10px; position:relative; z-index:2;}
-.message {display:flex; margin-bottom:10px; position:relative;}
-.message.received {justify-content:flex-start;}
-.message.sent {justify-content:flex-end;}
-.message-content {max-width:70%; padding:8px 12px; border-radius:18px; position:relative; margin:0 5px; word-break:break-word;}
-.received .message-content {background:#1a1a1a; border-top-left-radius:4px;}
-.sent .message-content {background:dodgerblue; color:white; border-top-right-radius:4px;}
-.message-time {font-size:10px; color:#888; text-align:right; margin-top:2px;}
-.sent .message-time {color:rgba(255,255,255,0.8);}
-.typing-indicator {display:flex; align-items:center; padding:8px 12px; background:#1a1a1a; border-radius:18px; border-top-left-radius:4px; width:fit-content; margin-bottom:10px; opacity:0; transition:opacity 0.3s;}
-.typing-indicator.visible {opacity:1;}
-.typing-dot {width:6px; height:6px; background:white; border-radius:50%; margin:0 2px; animation:typingAnimation 1.4s infinite ease-in-out;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Helvetica,Arial,sans-serif;}
+body{background:#000;height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;color:#fff;}
+.loading-screen{position:absolute;top:0;left:0;width:100%;height:100%;background:#111;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:1000;transition:opacity .5s;}
+.loading-screen.hidden{opacity:0;pointer-events:none;}
+.loader{width:50px;height:50px;border:5px solid #333;border-top:5px solid #00a2ff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:10px;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+.chat-container{width:360px;max-width:100%;height:700px;background:#111;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;display:none;}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:#1a1a1a;color:white;box-shadow:0 1px 2px rgba(0,0,0,.5);}
+.avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;margin-right:10px;border:2px solid #00a2ff;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.user-info{flex:1;overflow:hidden;}
+.user-name{font-weight:600;font-size:16px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+.user-status{font-size:12px;opacity:.7;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+.header-icons{display:flex;gap:15px;}
+.header-icons i{font-size:18px;cursor:pointer;}
+.chat-messages{flex:1;padding:15px;overflow-y:auto;background:#000;-webkit-overflow-scrolling:touch;}
+.date-separator{text-align:center;margin:15px 0;font-size:12px;color:#888;position:relative;}
+.date-separator:before{content:"";position:absolute;left:0;top:50%;right:0;height:1px;background:#333;z-index:1;}
+.date-separator span{background:#000;padding:0 10px;position:relative;z-index:2;}
+.message{display:flex;margin-bottom:10px;position:relative;}
+.message.received{justify-content:flex-start;}
+.message.sent{justify-content:flex-end;}
+.message-content{max-width:70%;padding:8px 12px;border-radius:18px;position:relative;margin:0 5px;word-break:break-word;}
+.received .message-content{background:#1a1a1a;border-top-left-radius:4px;}
+.sent .message-content{background:dodgerblue;color:white;border-top-right-radius:4px;}
+.message-time{font-size:10px;color:#888;text-align:right;margin-top:2px;}
+.sent .message-time{color:rgba(255,255,255,.8);}
+.typing-indicator{display:flex;align-items:center;padding:8px 12px;background:#1a1a1a;border-radius:18px;border-top-left-radius:4px;width:fit-content;margin-bottom:10px;opacity:0;transition:opacity .3s;}
+.typing-indicator.visible{opacity:1;}
+.typing-dot{width:6px;height:6px;background:white;border-radius:50%;margin:0 2px;animation:typingAnimation 1.4s infinite ease-in-out;}
 .typing-dot:nth-child(1){animation-delay:0s;}
-.typing-dot:nth-child(2){animation-delay:0.2s;}
-.typing-dot:nth-child(3){animation-delay:0.4s;}
-@keyframes typingAnimation{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);} }
-.chat-input {display:flex; align-items:center; padding:10px 15px; background:#111; border-top:1px solid #333;}
-.input-container {flex:1; background:#1a1a1a; border-radius:20px; display:flex; align-items:center; padding:5px 15px; margin-right:10px;}
-.input-container i {color:#888; margin:0 5px; cursor:pointer;}
-.chat-input input {flex:1; border:none; outline:none; padding:8px 5px; font-size:14px; color:#fff; background:transparent;}
-.send-button {width:36px; height:36px; border-radius:50%; background:dodgerblue; color:white; display:flex; justify-content:center; align-items:center; cursor:pointer;}
-@media (max-width:400px){.chat-container{width:100%; height:100%; border-radius:0;} body{background:#000;}}
-
+.typing-dot:nth-child(2){animation-delay:.2s;}
+.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typingAnimation{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.chat-input{display:flex;align-items:center;padding:10px 10px;background:#111;border-top:1px solid #333;}
+.input-container{flex:1;display:flex;align-items:center;background:#1a1a1a;border-radius:20px;padding:5px 10px;margin-right:10px;}
+.input-container i{color:#888;margin:0 5px;cursor:pointer;}
+.chat-input input{flex:1;border:none;outline:none;padding:8px 5px;font-size:14px;color:#fff;background:transparent;}
+.send-button{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:dodgerblue;color:white;display:flex;justify-content:center;align-items:center;cursor:pointer;}
+@media(max-width:400px){.chat-container{width:100%;height:100%;border-radius:0;}body{background:#000;}}
 </style>
 </head>
 <body>
 
 <div class="loading-screen" id="loadingScreen">
     <div class="loader"></div>
-    <p style="color:#fff;">Chats are loading…</p>
+    <p style="color:#fff;">Loading chat bot…</p>
 </div>
 
 <div class="chat-container" id="chatContainer">
     <div class="chat-header">
-        <div class="back-button"><i class="fas fa-chevron-left"></i></div>
         <div class="avatar"><img src="./UserClient/8D.jpg"/></div>
         <div class="user-info">
             <div class="user-name">Divya Joshi</div>
@@ -84,29 +80,17 @@ body {background:#000; height:100vh; display:flex; justify-content:center; align
 </div>
 
 <script>
-// References
 const loadingScreen = document.getElementById('loadingScreen');
 const chatContainer = document.getElementById('chatContainer');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
 
-let botData = [];
+let chatFlow = [];
 
-// Load bot data from JSON
-async function loadBotData() {
-    try {
-        const res = await fetch('https://syncjson.pages.dev/InAppChat.json'); // replace with your JSON
-        botData = await res.json();
-    } catch(e) {
-        console.error('Failed to load bot data:', e);
-    }
-}
-
-// Format IST time
+// Format IST
 function formatTime(ts){
-    const d=new Date(ts);
-    return d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
+    return new Date(ts).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});
 }
 
 // Date separator
@@ -129,69 +113,81 @@ function addDateSeparator(){
 }
 
 // Append message
-function appendMessage(text,sender){
+function appendMessage(text,sender,avatar){
+    if(!text) return;
     addDateSeparator();
+    avatar = avatar || (sender==='me'? './krisna.jpg' : './UserClient/8D.jpg');
     const div=document.createElement('div');
     div.className='message '+(sender==='me'?'sent':'received');
-    const avatar=sender==='me'?'./krisna.jpg':'./UserClient/8D.jpg';
-    div.innerHTML=`<div class="avatar"><img src="${avatar}"/></div><div class="message-content">${text}<div class="message-time">${formatTime(Date.now())}</div></div>`;
+    div.innerHTML=`<div class="avatar"><img src="${avatar}" onerror="this.src='./UserClient/8D.jpg'"/></div>
+                     <div class="message-content">${text}<div class="message-time">${formatTime(Date.now())}</div></div>`;
     chatMessages.appendChild(div);
     chatMessages.scrollTop=chatMessages.scrollHeight;
 }
 
-// Typing indicator
+// Typing indicator queue
+let typingQueue = [];
 function showTyping(){
     const div=document.createElement('div');
     div.className='typing-indicator visible';
     div.innerHTML=`<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
     chatMessages.appendChild(div);
     chatMessages.scrollTop=chatMessages.scrollHeight;
+    typingQueue.push(div);
     return div;
 }
-
-// Bot reply based on JSON flows
-function botReply(msg){
-    const typingEl = showTyping();
-    setTimeout(()=>{
-        typingEl.remove();
-        let reply="I will reply later 😈"; // default fallback
-        const userMsg = msg.toLowerCase();
-
-        for(let flow of botData){
-            for(let trigger of flow.triggers){
-                if(userMsg.includes(trigger.toLowerCase())){
-                    reply = flow.responses[Math.floor(Math.random()*flow.responses.length)];
-                    break;
-                }
-            }
-        }
-        appendMessage(reply,'bot');
-    }, 3000 + Math.random()*3000); // random typing delay 3-6s
+function removeTyping(){
+    const div = typingQueue.shift();
+    if(div) div.remove();
 }
 
-// Send message
+// Load JSON
+async function loadChatJSON(){
+    try{
+        const res = await fetch('https://syncjson.pages.dev/InAppChat.json');
+        chatFlow = await res.json();
+    }catch(e){ console.error('Failed to load JSON', e);}
+}
+
+// Bot reply
+function botReply(userMsg){
+    const typingEl = showTyping();
+    setTimeout(()=>{
+        removeTyping();
+        let reply = "I didn't understand that 😅";
+        const msg = (userMsg||'').toLowerCase();
+        chatFlow.forEach(item=>{
+            item.triggers.forEach(trigger=>{
+                if(msg.includes(trigger.toLowerCase())){
+                    const responses = item.responses;
+                    reply = responses[Math.floor(Math.random()*responses.length)];
+                }
+            });
+        });
+        appendMessage(reply,'bot');
+    },8000);
+}
+
+// Send
 function sendMessage(){
-    const text=chatInput.value.trim();
+    const text = chatInput.value.trim();
     if(!text) return;
     appendMessage(text,'me');
     chatInput.value='';
-    setTimeout(()=>botReply(text),1000); // bot start after 1s
+    setTimeout(()=>botReply(text),5000);
 }
 
-// Event listeners
+// Events
 sendBtn.addEventListener('click',sendMessage);
 chatInput.addEventListener('keypress',e=>{if(e.key==='Enter') sendMessage();});
 
-// Show chat when ready
+// Init
 window.addEventListener('load', async ()=>{
-    await loadBotData(); // Load JSON first
-    setTimeout(()=>{
-        loadingScreen.classList.add('hidden');
-        chatContainer.style.display='flex';
-        chatInput.focus();
-    },100);
+    await loadChatJSON();
+    loadingScreen.classList.add('hidden');
+    chatContainer.style.display='flex';
+    chatInput.focus();
 });
 </script>
-
 </body>
 </html>
