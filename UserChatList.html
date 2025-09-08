@@ -154,7 +154,7 @@ function botReply(userMsg){
     const typingEl = showTyping();
     setTimeout(()=>{
         removeTyping();
-        let reply = "I didn't understand that 😅";
+        let reply = "Wait,mom is front of me 😅";
         const msg = (userMsg||'').toLowerCase();
         chatFlow.forEach(item=>{
             item.triggers.forEach(trigger=>{
@@ -191,3 +191,4 @@ window.addEventListener('load', async ()=>{
 </script>
 </body>
 </html>
+
