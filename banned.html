@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Boy App — Unavailable Region</title>
+<style>
+:root {
+  --accent: #007aff;
+  --success: #34c759;
+  --muted: #6b6f76;
+  --bg1: #f2f5fb;
+  --bg2: #dce8fb;
+  --card-bg: rgba(255,255,255,0.85);
+  --radius: 18px;
+  --shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Full mobile layout */
+html,body {
+  margin:0; padding:0;
+  width:100%; height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(160deg,var(--bg1),var(--bg2));
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  position: relative;
+}
+
+/* Animated background blobs */
+.bg-blobs {
+  position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+}
+.blob {
+  position:absolute;
+  width: 300px; height:300px;
+  border-radius:50%;
+  opacity:0.5;
+  filter: blur(60px) saturate(120%);
+  animation: float 15s ease-in-out infinite alternate;
+}
+.blob.b1 { background:#ffd5e8; top:-80px; left:-60px; animation-duration:18s; }
+.blob.b2 { background:#d2e7ff; bottom:-100px; right:-70px; animation-duration:22s; }
+
+@keyframes float{
+  0%{transform: translate(0,0);}
+  50%{transform: translate(20px,-30px);}
+  100%{transform: translate(0,0);}
+}
+
+/* Main card */
+.card {
+  position:relative; z-index:1;
+  width:100%; max-width:400px;
+  border-radius: var(--radius);
+  padding:22px; background: var(--card-bg);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  text-align:left;
+}
+
+/* iOS style handle */
+.handle {
+  width:56px; height:4px; background: rgba(0,0,0,0.08);
+  border-radius:999px; margin:6px auto 12px auto;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
+}
+
+/* Text styles */
+h1 { font-size:1.6rem; margin-bottom:8px; font-weight:600; color:#111; text-align:center; }
+p { font-size:15px; line-height:1.45; margin:6px 0; color:#333; text-align:center; }
+.email { font-weight:600; color: var(--accent); word-break:break-word; font-size:15px; margin:14px 0; text-align:center; }
+
+/* Button */
+.btn {
+  width:100%; margin-top:14px;
+  padding:12px; border:none; border-radius:12px;
+  background: var(--accent); color:#fff; font-weight:700; font-size:16px;
+  text-align:center; box-shadow: 0 8px 18px rgba(0,122,255,0.18);
+  transition: transform 0.16s, box-shadow 0.16s; cursor:pointer;
+}
+.btn:active { transform:translateY(1px) scale(.998); box-shadow:0 6px 14px rgba(0,122,255,0.14); }
+
+/* Toast */
+.toast {
+  position:absolute; left:50%; bottom:12px;
+  transform:translateX(-50%);
+  background: rgba(0,0,0,0.75); color:#fff;
+  padding:8px 12px; border-radius:12px; font-size:13px;
+  opacity:0; pointer-events:none; transition: opacity 0.22s, transform 0.22s; z-index:5;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto; }
+
+/* Small mobile adjustments */
+@media(max-width:360px){
+  .card{padding:18px; border-radius:14px;}
+  h1{font-size:1.4rem;}
+  p, .email{font-size:14px;}
+  .btn{font-size:15px;padding:10px;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-blobs">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+</div>
+
+<main class="card" role="main">
+  <div class="handle"></div>
+  <h1>Unavailable -_-</h1>
+  <p>We're sorry, but Boy App is not available in your region at this time. Access is restricted and you cannot use the app from here.</p>
+  <p>If you would like to request access or receive updates, please contact our support team via email below,<br>Thank you for your understanding.</p>
+  <p class="email" id="email">helloplayboys@gmail.com</p>
+  <button class="btn" id="copyBtn">Copy Email</button>
+  <div class="toast" id="toast">copied</div>
+</main>
+
+<script>
+(function(){
+  const btn = document.getElementById('copyBtn');
+  const emailEl = document.getElementById('email');
+  const toast = document.getElementById('toast');
+
+  btn.addEventListener('click', async ()=>{
+    const email = emailEl.textContent.trim();
+    try {
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(email);
+      } else {
+        const ta=document.createElement('textarea'); ta.value=email;
+        ta.style.position='fixed'; ta.style.left='-9999px';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+      }
+      if(navigator.vibrate){navigator.vibrate(10);}
+      toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2000);
+    } catch(e){
+      toast.textContent='Copy failed'; toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'),2000);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
