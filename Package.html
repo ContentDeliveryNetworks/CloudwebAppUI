@@ -95,199 +95,214 @@
     </div>
   </div>
 </div>
-
 <style>
-/* Popup Overlay */
-.popup-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 10px;
-  box-sizing: border-box;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    .popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);justify-content:center;align-items:center;z-index:9999;padding:2vw;box-sizing:border-box}
+    .popup-content{background:linear-gradient(135deg,#fff 0%,#f6f8ff 100%);border-radius:24px;padding:2rem;max-width:420px;width:90%;text-align:center;font-family:-apple-system,Inter,'Helvetica Neue',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.2),0 6px 12px rgba(0,0,0,.1);animation:popupShow .4s ease-out;border:1px solid rgba(255,255,255,.6);position:relative}
+    .divider{height:1px;background:linear-gradient(to right,transparent,rgba(0,0,0,.15),transparent);margin:1.2rem 0}
+    #discountPercent{display:inline-block;background:linear-gradient(45deg,red,#f3b700);color:white;font-weight:700;padding:.5rem 1rem;border-radius:12px;margin:.8rem auto;animation:pulse 2s infinite ease-in-out;font-size:1.1rem}
+    .button-group{display:flex;justify-content:center;margin-top:1.5rem;gap:1rem;flex-wrap:wrap}
+    .shop-btn,.close-btn{flex:1;min-width:min(130px,40vw);padding:.9rem 1.2rem;border-radius:14px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .2s,background .2s,box-shadow .2s}
+    .shop-btn{background:#007aff;color:#fff;box-shadow:0 4px 10px rgba(0,122,255,.3);animation:pulseButton 1.5s infinite ease-in-out}
+    .shop-btn:hover{transform:translateY(-3px);background:#005bb5;box-shadow:0 6px 15px rgba(0,122,255,.4)}
+    .close-btn{background:#f1f1f6;color:#007aff;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    .close-btn:hover{transform:translateY(-3px);background:#e0e0e5;box-shadow:0 6px 15px rgba(0,0,0,.15)}
+    .popup-content h2{font-size:min(1.8rem,6vw);font-weight:700;margin-bottom:1rem;color:dodgerblue;letter-spacing:-.02em}
+    .popup-content p{font-size:min(1.2rem,4.5vw);margin:.6rem 0;color:darkcyan}
+    #countdown{font-size:min(1.1rem,4vw);font-weight:600;color:#ff3b30;margin-top:.8rem;animation:fadeIn .5s ease-in}
+    #expiryDate{font-size:min(1rem,3.8vw);font-weight:500;color:#2c2c2e;margin-top:.6rem}
+    @keyframes popupShow{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    @keyframes pulseButton{0%{box-shadow:0 4px 10px rgba(0,122,255,.3)}50%{box-shadow:0 6px 15px rgba(0,122,255,.5)}100%{box-shadow:0 4px 10px rgba(0,122,255,.3)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @media (max-width:768px){.popup-content{padding:1.5rem;border-radius:20px;max-width:90%}.shop-btn,.close-btn{font-size:.95rem;padding:.8rem 1rem;min-width:35vw}#discountPercent{font-size:1rem;padding:.4rem .8rem}}
+    @media (max-width:480px){.popup-content{padding:1.2rem;border-radius:16px}.shop-btn,.close-btn{font-size:.9rem;padding:.7rem .9rem;min-width:40vw}.popup-content h2{font-size:min(1.5rem,5.5vw)}.popup-content p{font-size:min(1rem,4vw)}#countdown,#expiryDate{font-size:min(.95rem,3.8vw)}#discountPercent{font-size:.85rem;padding:.35rem .7rem}}
+    @media (max-width:320px){.popup-content{padding:1rem;border-radius:14px}.shop-btn,.close-btn{font-size:.85rem;padding:.6rem .8rem;min-width:45vw}.popup-content h2{font-size:min(1.3rem,5vw)}.popup-content p{font-size:min(.9rem,3.8vw)}#countdown,#expiryDate{font-size:min(.85rem,3.5vw)}#discountPercent{font-size:.8rem;padding:.3rem .6rem}}
+    @media (max-width:280px){.popup-content{padding:.8rem;border-radius:12px}.button-group{flex-direction:column}.shop-btn,.close-btn{min-width:80%;margin:.2rem 0}.popup-content h2{font-size:min(1.2rem,4.8vw)}.popup-content p{font-size:min(.85rem,3.5vw)}#countdown,#expiryDate{font-size:min(.8rem,3.2vw)}#discountPercent{font-size:.75rem;padding:.25rem .5rem}}
+  </style>
 
-/* Popup Content */
-.popup-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 400px;
-  width: 100%;
-  text-align: center;
-  font-family: 'Arial', sans-serif;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  animation: popupShow 0.3s ease-out;
-}
+  <div id="popup" class="popup-overlay">
+    <div class="popup-content">
+      <h2 id="popupPrice"></h2>
+      <div class="divider"></div>
+      <p id="beforePrice"></p>
+      <p id="discountPercent"></p>
+      <p id="savings"></p>
+      <div class="divider"></div>
+      <p id="expiryDate"></p>
+      <p id="countdown"></p>
+      <div class="button-group">
+        <button class="shop-btn" onclick="shopNow()" aria-label="Shop Now">🔥 Claim Offer</button>
+        <button class="close-btn" onclick="closePopup()" aria-label="Close Popup">not intrested</button>
+      </div>
+    </div>
+  </div>
 
-/* Divider */
-.divider {
-  height: 1px;
-  background: #ddd;
-  margin: 12px 0;
-}
+  <script>
+    const CONFIG = {
+      fallbackData: { mainPrice: 4999, finalPrice: 2000, discountPercent: 60, savings: 2999 },
+      appUrl: "myapp://discount",
+      fallbackUrl: "https://himanpayment2checkout.pages.dev/Discount.html",
+      offerDurationDays: 5
+    };
 
-/* Buttons */
-.button-group {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 15px;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+    async function fetchDiscountData() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-.shop-btn, .close-btn {
-  flex: 1;
-  min-width: 100px;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
+        const [feeRes, discountRes] = await Promise.all([
+          fetch("https://syncjson.pages.dev/Fees.json", { signal: controller.signal, mode: 'cors' })
+            .catch(err => { throw new Error(`Fees.json fetch failed: ${err.message} (URL: https://syncjson.pages.dev/Fees.json)`); }),
+          fetch("https://syncjson.pages.dev/Discount.json", { signal: controller.signal, mode: 'cors' })
+            .catch(err => { throw new Error(`Discount.json fetch failed: ${err.message} (URL: https://syncjson.pages.dev/Discount.json)`); })
+        ]);
 
-.shop-btn {
-  background: #28a745;
-  color: #fff;
-}
+        clearTimeout(timeoutId);
 
-.shop-btn:hover {
-  transform: translateY(-2px);
-  background: #218838;
-}
+        if (!feeRes.ok) throw new Error(`Fees.json returned status: ${feeRes.status} ${feeRes.statusText}`);
+        if (!discountRes.ok) throw new Error(`Discount.json returned status: ${discountRes.status} ${discountRes.statusText}`);
 
-.close-btn {
-  background: #dc3545;
-  color: #fff;
-}
+        const feeData = await feeRes.json().catch(err => {
+          throw new Error(`Failed to parse Fees.json: ${err.message}`);
+        });
+        const discountData = await discountRes.json().catch(err => {
+          throw new Error(`Failed to parse Discount.json: ${err.message}`);
+        });
 
-.close-btn:hover {
-  transform: translateY(-2px);
-  background: #c82333;
-}
+        const mainPrice = parseFloat(feeData.register_fee);
+        const finalPrice = parseFloat(discountData.discount);
 
-/* Responsive Text */
-.popup-content h2 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-}
+        if (isNaN(mainPrice) || isNaN(finalPrice) || mainPrice <= 0 || finalPrice < 0 || typeof feeData.register_fee !== 'string' || typeof discountData.discount !== 'string') {
+          throw new Error("Invalid price data: register_fee or discount is missing, non-numeric, or invalid");
+        }
 
-.popup-content p {
-  font-size: 1rem;
-  margin: 5px 0;
-}
+        if (mainPrice === finalPrice) {
+          console.warn("No discount applied: using fallback data");
+          setPriceData(CONFIG.fallbackData);
+          return true;
+        }
 
-/* Popup animation */
-@keyframes popupShow {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@media (max-width: 480px) {
-  .popup-content {
-    padding: 15px;
-    font-size: 14px;
-  }
-  .shop-btn, .close-btn {
-    font-size: 14px;
-    padding: 8px 12px;
-  }
-}
-</style>
-
-<script>
-async function fetchDiscountData() {
-  try {
-    const [feeRes, discountRes] = await Promise.all([
-      fetch("https://syncjson.pages.dev/Fees.json"),
-      fetch("https://syncjson.pages.dev/Discount.json")
-    ]);
-
-    const feeData = await feeRes.json();
-    const discountData = await discountRes.json();
-
-    const mainPrice = parseFloat(feeData.register_fee);
-    const finalPrice = parseFloat(discountData.discount);
-
-    if (isNaN(mainPrice) || isNaN(finalPrice)) throw new Error("Invalid data");
-
-    const discountPercent = (((mainPrice - finalPrice) / mainPrice) * 100).toFixed(1);
-    const savings = (mainPrice - finalPrice).toFixed(0);
-
-    document.getElementById("beforePrice").innerText = `Rs ${mainPrice}`;
-    document.getElementById("popupPrice").innerText = `Now Register Fees is Rs ${finalPrice}`;
-    document.getElementById("discountPercent").innerText = `${discountPercent}% OFF 🎉`;
-    document.getElementById("savings").innerText = `You SAVE Rs ${savings}!`;
-
-    const validityEl = document.getElementById("validity");
-    const today = new Date();
-
-    let expiryDate = localStorage.getItem("offerExpiry");
-    if (!expiryDate) {
-      const expiry = new Date(today.getTime());
-      expiry.setDate(expiry.getDate() + 5);
-      expiryDate = expiry.toISOString();
-      localStorage.setItem("offerExpiry", expiryDate);
+        const discountPercent = (((mainPrice - finalPrice) / mainPrice) * 100).toFixed(1);
+        const savings = (mainPrice - finalPrice).toFixed(0);
+        setPriceData({ mainPrice, finalPrice, discountPercent, savings });
+        return true;
+      } catch (err) {
+        console.error(`Error fetching discount data: ${err.message}`);
+        setPriceData(CONFIG.fallbackData);
+        return true;
+      }
     }
 
-    const expiry = new Date(expiryDate);
-    if (expiry <= today) {
-      document.getElementById("popup").remove();
-      return false;
+    function setPriceData({ mainPrice, finalPrice, discountPercent, savings }) {
+      document.getElementById("beforePrice").innerText = `Regular Price: ${mainPrice} Rs`;
+      document.getElementById("popupPrice").innerText = `Exclusive Offer: ${finalPrice} Rs`;
+      document.getElementById("discountPercent").innerText = `${discountPercent}% Discount🎉`;
+      document.getElementById("savings").innerText = `Savings: ${savings}Rs`;
     }
 
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    validityEl.innerText = `⏳ Offer valid until ${expiry.toLocaleDateString('en-GB', options)}`;
+    function updateCountdown(expiry) {
+      const countdownEl = document.getElementById("countdown");
+      const interval = setInterval(() => {
+        const now = new Date();
+        const offsetIST = 5.5 * 60 * 60 * 1000; // UTC+05:30
+        const nowIST = new Date(now.getTime() + offsetIST);
+        const timeLeft = expiry - now;
 
-    return true;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          document.getElementById("popup").remove();
+          localStorage.removeItem("offerExpiry");
+          return;
+        }
 
-  } catch (err) {
-    console.error("Error fetching discount data:", err);
-    document.getElementById("beforePrice").innerText = "Rs 4999";
-    document.getElementById("popupPrice").innerText = "Now: Rs 2000";
-    document.getElementById("discountPercent").innerText = "60% OFF";
-    document.getElementById("savings").innerText = "You save Rs 2999!";
-    document.getElementById("validity").innerText = "⏳ Offer valid until 1 September 2028";
-    return true;
-  }
-}
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        const milliseconds = Math.floor(timeLeft % 1000).toString().padStart(3, '0');
 
-function showPopup() {
-  const popup = document.getElementById("popup");
-  if (popup) popup.style.display = "flex";
-}
+        countdownEl.innerText = `⏳ Offer ends in ${days}d ${hours}h ${minutes}m ${seconds}s ${milliseconds}`;
+      }, 100); // Update every 100ms
+    }
 
-function closePopup() {
-  const popup = document.getElementById("popup");
-  if (popup) popup.style.display = "none";
-}
+    async function managePopup() {
+      const now = new Date();
+      const offsetIST = 5.5 * 60 * 60 * 1000; // UTC+05:30
+      const today = new Date(now.getTime() + offsetIST);
+      let expiryDate = localStorage.getItem("offerExpiry");
+      let isFirstVisit = !expiryDate;
 
-function shopNow() {
-  window.location.href = "https://himanpayment2checkout.pages.dev/Discount.html";
-}
+      if (isFirstVisit) {
+        const expiry = new Date(today);
+        expiry.setDate(expiry.getDate() + CONFIG.offerDurationDays);
+        expiryDate = expiry.toISOString();
+        localStorage.setItem("offerExpiry", expiryDate);
+      }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const popup = document.getElementById("popup");
-  if (popup) {
-    popup.addEventListener("click", function(e) {
-      if (e.target.id === 'popup') closePopup();
+      const expiry = new Date(expiryDate);
+      if (expiry <= today) {
+        document.getElementById("popup").remove();
+        localStorage.removeItem("offerExpiry");
+        return false;
+      }
+
+      const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+      const expiryDateEl = document.getElementById("expiryDate");
+      if (isFirstVisit) {
+        expiryDateEl.innerText = `Offer ends on ${expiry.toLocaleString('en-IN', { ...options, timeZone: 'Asia/Kolkata' })}`;
+      } else {
+        expiryDateEl.style.display = 'none';
+      }
+      updateCountdown(expiry);
+      return true;
+    }
+
+    function showPopup() {
+      const popup = document.getElementById("popup");
+      if (popup) popup.style.display = "flex";
+    }
+
+    function closePopup() {
+      const popup = document.getElementById("popup");
+      if (popup) popup.style.display = "none";
+    }
+
+    function shopNow() {
+      const link = document.createElement("a");
+      link.href = CONFIG.appUrl;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => {
+        window.location.href = CONFIG.fallbackUrl;
+      }, 1500);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const popup = document.getElementById("popup");
+      if (popup) {
+        popup.addEventListener("click", function(e) {
+          if (e.target.id === 'popup') closePopup();
+        });
+      }
+
+      const popupValid = await managePopup();
+      if (!popupValid) return;
+
+      setTimeout(async () => {
+        try {
+          const dataValid = await fetchDiscountData();
+          if (dataValid) showPopup();
+        } catch (err) {
+          console.error(`Error in popup initialization: ${err.message}`);
+          showPopup();
+        }
+      }, 3000);
     });
-  }
-
-  setTimeout(async () => {
-    const valid = await fetchDiscountData();
-    if (valid) showPopup();
-  }, 2000); // 2 seconds delay
-});
-</script>
-
+  </script>
   
   <!-- Fetch JSON Price -->
   <script>
