@@ -76,219 +76,218 @@
   </div>
 
 
-<style>
-    .popup-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .popup-box {
-      background: #fff;
-      border-radius: 18px;
-      padding: 22px 20px;
-      width: 92%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-      animation: slideUp 0.35s ease-in-out;
-      position: relative;
-    }
-
-    .popup-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: red;
-    }
-
-    .popup-message {
-      font-size: 0.95rem;
-      color: dodgerblue;
-      font-style: italic;
-      margin-bottom: 14px;
-      line-height: 1.4;
-    }
-
-    .before-price {
-      text-decoration: line-through;
-      color:red;
-      font-style: oblique;
-      font-size: 2.10rem;
-    }
-
-    .popup-price {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: dodgerblue;
-      margin-top: 10px;
-    }
-
-   .discount-percent {
-  font-size: 2.95rem;
-  font-weight: 600;
-  color: red;
-}
-
-    .savings {
-      font-size: 0.95rem;
-      color: #19722e;
-      margin-top: 4px;
-      font-style: italic;
-      font-weight: 500;
-    }
-
-    .validity {
-      font-size: 0.85rem;
-      color: #ff0000;
-      margin-top: 12px;
-    }
-
-    .popup-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .popup-button {
-      padding: 14px 0;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-
-    .popup-button.shop {
-      background: linear-gradient(135deg, #007aff, #ff0000);
-      color: #fff;
-      letter-spacing: 0.3px;
-      box-shadow: 0 3px 10px rgba(0, 122, 255, 0.3);
-    }
-
-    .popup-button.cancel {
-      background: #fff;
-      color: #333;
-    }
-
-    .popup-button:active {
-      transform: scale(0.97);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-  </style>
 
   
-  <div class="popup-overlay" id="popup">
-    <div class="popup-box" id="popupBox">
-      <div class="popup-title">🎁 Exclusive Deal!</div>
-      <div class="popup-message">We’ve dropped the price just for you. Grab it before it’s gone 🚀</div>
-      <div class="before-price" id="beforePrice"></div>
-           <div class="discount-percent" id="discountPercent"></div>
-      <div class="popup-price" id="popupPrice"></div>
-      <div class="validity" id="validity"></div>
-            <div class="savings" id="savings"></div>
-      <div class="popup-buttons">
-        <button class="popup-button shop" onclick="shopNow()">🔥 Grab Deal Now</button>
-        <button class="popup-button cancel" onclick="closePopup()">Maybe Later</button>
-      </div>
+<div id="popup" class="popup-overlay">
+  <div class="popup-content">
+    <h2 id="popupPrice"></h2>
+    <div class="divider"></div>
+    <p id="beforePrice"></p>
+    <div class="divider"></div>
+    <p id="discountPercent"></p>
+    <div class="divider"></div>
+    <p id="savings"></p>
+    <div class="divider"></div>
+    <p id="validity"></p>
+    <div class="button-group">
+      <button class="shop-btn" onclick="shopNow()">Shop Now</button>
+      <button class="close-btn" onclick="closePopup()">Close</button>
     </div>
   </div>
+</div>
 
-  <script>
-    async function fetchDiscountData() {
-      try {
-        const [feeRes, discountRes] = await Promise.all([
-          fetch("https://syncjson.pages.dev/Fees.json"),
-          fetch("https://syncjson.pages.dev/Discount.json")
-        ]);
+<style>
+/* Popup Overlay */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 10px;
+  box-sizing: border-box;
+}
 
-        const feeData = await feeRes.json();
-        const discountValue = await discountRes.json();
+/* Popup Content */
+.popup-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  animation: popupShow 0.3s ease-out;
+}
 
-        const mainPrice = parseFloat(feeData.register_fee);
-        const finalPrice = parseFloat(discountValue);
+/* Divider */
+.divider {
+  height: 1px;
+  background: #ddd;
+  margin: 12px 0;
+}
 
-        if (isNaN(mainPrice) || isNaN(finalPrice)) throw new Error("Please Contact Us");
+/* Buttons */
+.button-group {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-        const discountPercent = (((mainPrice - finalPrice) / mainPrice) * 100).toFixed(1);
-        const savings = (mainPrice - finalPrice).toFixed(0);
+.shop-btn, .close-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
 
-        document.getElementById("beforePrice").innerText = `Rs${mainPrice}`;
-        document.getElementById("popupPrice").innerText = `Now Register Fees is Rs${finalPrice}`;
-        document.getElementById("discountPercent").innerText = `${discountPercent}% OFF🎉`;
-        document.getElementById("savings").innerText = `You SAVE ${savings}Rs!`;
+.shop-btn {
+  background: #28a745;
+  color: #fff;
+}
 
-        // Offer validity
-        const validityEl = document.getElementById("validity");
-        const today = new Date();
+.shop-btn:hover {
+  transform: translateY(-2px);
+  background: #218838;
+}
 
-        let expiryDate = localStorage.getItem("offerExpiry");
-        if (!expiryDate) {
-          const expiry = new Date();
-          expiry.setDate(today.getDate() + 5);
-          expiryDate = expiry.toISOString();
-          localStorage.setItem("offerExpiry", expiryDate);
-        }
+.close-btn {
+  background: #dc3545;
+  color: #fff;
+}
 
-        const expiry = new Date(expiryDate);
-        if (expiry <= today) {
-          document.getElementById("popup").remove();
-          return false;
-        }
+.close-btn:hover {
+  transform: translateY(-2px);
+  background: #c82333;
+}
 
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        validityEl.innerText = `⏳ Offer valid until ${expiry.toLocaleDateString('en-GB', options)}`;
+/* Responsive Text */
+.popup-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
 
-        return true;
-      } catch (err) {
-        console.error("Error fetching discount data:", err);
-        document.getElementById("beforePrice").innerText = "Rs 4999";
-        document.getElementById("popupPrice").innerText = "Now: Rs 2000";
-        document.getElementById("discountPercent").innerText = "60% OFF";
-        document.getElementById("savings").innerText = "You save Rs 2999!";
-        document.getElementById("validity").innerText = "⏳ Offer valid until 1 September 2028";
-        return true;
-      }
+.popup-content p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+/* Popup animation */
+@keyframes popupShow {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  .popup-content {
+    padding: 15px;
+    font-size: 14px;
+  }
+  .shop-btn, .close-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+</style>
+
+<script>
+async function fetchDiscountData() {
+  try {
+    const [feeRes, discountRes] = await Promise.all([
+      fetch("https://syncjson.pages.dev/Fees.json"),
+      fetch("https://syncjson.pages.dev/Discount.json")
+    ]);
+
+    const feeData = await feeRes.json();
+    const discountData = await discountRes.json();
+
+    const mainPrice = parseFloat(feeData.register_fee);
+    const finalPrice = parseFloat(discountData.discount);
+
+    if (isNaN(mainPrice) || isNaN(finalPrice)) throw new Error("Invalid data");
+
+    const discountPercent = (((mainPrice - finalPrice) / mainPrice) * 100).toFixed(1);
+    const savings = (mainPrice - finalPrice).toFixed(0);
+
+    document.getElementById("beforePrice").innerText = `Rs ${mainPrice}`;
+    document.getElementById("popupPrice").innerText = `Now Register Fees is Rs ${finalPrice}`;
+    document.getElementById("discountPercent").innerText = `${discountPercent}% OFF 🎉`;
+    document.getElementById("savings").innerText = `You SAVE Rs ${savings}!`;
+
+    const validityEl = document.getElementById("validity");
+    const today = new Date();
+
+    let expiryDate = localStorage.getItem("offerExpiry");
+    if (!expiryDate) {
+      const expiry = new Date(today.getTime());
+      expiry.setDate(expiry.getDate() + 5);
+      expiryDate = expiry.toISOString();
+      localStorage.setItem("offerExpiry", expiryDate);
     }
 
-    function showPopup() {
-      document.getElementById("popup").style.display = "flex";
-    }
-    function closePopup() {
-      document.getElementById("popup").style.display = "none";
-    }
-    function shopNow() {
-      window.location.href = "https://himanpayment2checkout.pages.dev/Discount.html"; // replace with your shop page
+    const expiry = new Date(expiryDate);
+    if (expiry <= today) {
+      document.getElementById("popup").remove();
+      return false;
     }
 
-    // Tap outside to close
-    document.getElementById("popup").addEventListener("click", function(e) {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    validityEl.innerText = `⏳ Offer valid until ${expiry.toLocaleDateString('en-GB', options)}`;
+
+    return true;
+
+  } catch (err) {
+    console.error("Error fetching discount data:", err);
+    document.getElementById("beforePrice").innerText = "Rs 4999";
+    document.getElementById("popupPrice").innerText = "Now: Rs 2000";
+    document.getElementById("discountPercent").innerText = "60% OFF";
+    document.getElementById("savings").innerText = "You save Rs 2999!";
+    document.getElementById("validity").innerText = "⏳ Offer valid until 1 September 2028";
+    return true;
+  }
+}
+
+function showPopup() {
+  const popup = document.getElementById("popup");
+  if (popup) popup.style.display = "flex";
+}
+
+function closePopup() {
+  const popup = document.getElementById("popup");
+  if (popup) popup.style.display = "none";
+}
+
+function shopNow() {
+  window.location.href = "https://himanpayment2checkout.pages.dev/Discount.html";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("popup");
+  if (popup) {
+    popup.addEventListener("click", function(e) {
       if (e.target.id === 'popup') closePopup();
     });
+  }
 
-    window.addEventListener("load", () => {
-      setTimeout(async () => {
-        const valid = await fetchDiscountData();
-        if (valid) showPopup();
-      }, 5000);
-    });
-  </script>
+  setTimeout(async () => {
+    const valid = await fetchDiscountData();
+    if (valid) showPopup();
+  }, 2000); // 2 seconds delay
+});
+</script>
+
   
   <!-- Fetch JSON Price -->
   <script>
