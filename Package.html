@@ -76,25 +76,22 @@
   </div>
 
 
-
-  
-<div id="popup" class="popup-overlay">
-  <div class="popup-content">
-    <h2 id="popupPrice"></h2>
-    <div class="divider"></div>
-    <p id="beforePrice"></p>
-    <div class="divider"></div>
-    <p id="discountPercent"></p>
-    <div class="divider"></div>
-    <p id="savings"></p>
-    <div class="divider"></div>
-    <p id="validity"></p>
-    <div class="button-group">
-      <button class="shop-btn" onclick="shopNow()">Shop Now</button>
-      <button class="close-btn" onclick="closePopup()">Close</button>
+  <div id="popup" class="popup-overlay">
+    <div class="popup-content">
+      <h2 id="popupPrice"></h2>
+      <div class="divider"></div>
+      <p id="beforePrice"></p>
+      <p id="discountPercent"></p>
+      <p id="savings"></p>
+      <div class="divider"></div>
+      <p id="expiryDate"></p>
+      <p id="countdown"></p>
+      <div class="button-group">
+        <button class="shop-btn" onclick="shopNow()" aria-label="Shop Now">🔥 Claim Offer</button>
+        <button class="close-btn" onclick="closePopup()" aria-label="Close Popup">not intrested</button>
+      </div>
     </div>
   </div>
-</div>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     .popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);justify-content:center;align-items:center;z-index:9999;padding:2vw;box-sizing:border-box}
