@@ -18,9 +18,9 @@
       overflow: hidden;
     }
     .container {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(20px);
-      width: 100%;
+      width: 95%;
       max-width: 400px;
       margin: 20px;
       border-radius: 24px;
@@ -43,17 +43,19 @@
     }
     p {
       color: #3c3c43;
-      font-size: 17px;
-      opacity: 0.8;
+      font-size: 16px;
+      opacity: 0.85;
       margin: 8px 0;
+      line-height: 1.5;
     }
     .timer {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 700;
       color: #007aff;
       margin-top: 12px;
       font-family: "SF Mono", monospace;
       display: none;
+      word-break: break-word;
     }
     #activateBtn {
       width: 100%;
@@ -89,6 +91,8 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.8s ease;
+      padding: 20px;
+      text-align: center;
     }
     .success-screen.show {
       opacity: 1;
@@ -105,6 +109,12 @@
       100% {transform: scale(1);}
     }
     #message { display: none; text-align: left; }
+    @media (max-width: 480px) {
+      .container { padding: 16px; }
+      .timer { font-size: 20px; }
+      #activateBtn { font-size: 16px; padding: 14px; }
+      p { font-size: 15px; }
+    }
   </style>
 </head>
 <body>
@@ -114,7 +124,7 @@
     Activated Successfully
   </div>
 
-  <div class="container" id="container">
+  <div class="container">
 
     <div class="status-icon">
       <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
@@ -132,14 +142,13 @@
     <p id="message">
       Hello <strong><span id="userNameSpan"></span></strong>, 👋<br>
       We noticed some unusual activity on your account, so it’s temporarily in <strong>suspicion mode</strong>.<br>
-      <span style="color:green;"><strong>you’ve already paid suspension fees, so don’t worry❤️</strong></span><br>
-      Great news! Your profile review request has been successfully submitted. We’ll take care of it & keep you updated every step of the way. 💖 It may take up to 30 working days, but you’ll see the remaining days in the countdown below.
-      We’ll notify you at <strong><span id="userEmailSpan"></span></strong> and <strong><span id="userPhoneSpan"></span></strong> as soon as your account is <strong>verified or active</strong>.<br><br>
+      <span style="color:green;"><strong>you’ve already paid suspension fees, so don’t worry ❤️</strong></span><br>
+      Great news! Your profile review request has been successfully submitted. 💖 It may take up to 30 working days, but you’ll see the remaining days in the countdown below.<br>
+      We’ll notify you at <strong><span id="userPhoneSpan"></span></strong> as soon as your account is <strong>verified or active</strong>.<br><br>
       Thank you for your patience, trust, and understanding. We’re with you every step of the way, your safety is our priority. 💖🌟
     </p>
 
     <button id="activateBtn">Request Activate Account</button>
-
     <div class="timer" id="timer">00:00:00:00</div>
 
   </div>
@@ -152,7 +161,6 @@
     const messageEl = document.getElementById("message");
 
     const userNameEl = document.getElementById("userNameSpan");
-    const userEmailEl = document.getElementById("userEmailSpan");
     const userPhoneEl = document.getElementById("userPhoneSpan");
 
     // Load user data from localStorage or fetch JSON
@@ -160,14 +168,12 @@
     if (savedUser) {
       const userData = JSON.parse(savedUser);
       userNameEl.textContent = userData.name;
-      userEmailEl.textContent = userData.email;
       userPhoneEl.textContent = userData.phone;
     } else {
       fetch("https://syncjson.pages.dev/account-activation.json")
         .then(res => res.json())
         .then(data => {
           userNameEl.textContent = data.name;
-          userEmailEl.textContent = data.email;
           userPhoneEl.textContent = data.phone;
           localStorage.setItem("userData", JSON.stringify(data));
         })
@@ -189,7 +195,7 @@
       Swal.fire({
         icon: 'success',
         title: 'Hooray! Success!',
-        text: 'We’ve received your activation request sit back and relax! 🌟',
+        text: 'We’ve received your activation request, sit back and relax! 🌟',
         showConfirmButton: false,
         timer: 2000
       }).then(() => {
@@ -204,7 +210,6 @@
         localStorage.setItem("activationDuration", durationMs);
 
         activateBtn.style.display = "none";
-
         startTimer(now, durationMs);
       });
     });
