@@ -180,19 +180,19 @@
         let msg = "";
         switch (diffDays) {
           case 1:
-            msg = "21 Slots Available";
+            msg = "21";
             break;
           case 2:
-            msg = "14 Slots Available";
+            msg = "14";
             break;
           case 3:
-            msg = "8 Slots Available";
+            msg = "8";
             break;
           case 4:
-            msg = "5 Slots Available";
+            msg = "5";
             break;
           case 5:
-            msg = "1 Slot Left!";
+            msg = "1";
             break;
           default:
             msg = "Please contact customer care to register.";
@@ -202,7 +202,7 @@
         return { day: diffDays, text: msg };
       } catch (e) {
         console.warn("Registration status fallback:", e);
-        return { day: 1, text: "21 Slots Available" };
+        return { day: 1, text: "21" };
       }
     }
 
@@ -386,7 +386,7 @@
       // 2) Set registration slots text (based on registrationStart localStorage)
       const regEl = document.getElementById("registerSlots");
       const reg = getRegistrationStatusText();
-      if (regEl) regEl.innerText = `🟢 Only the first ${reg.text} 21 Call Boys in your area can claim this offer. After that, the offer will end.`;
+      if (regEl) regEl.innerText = `🟢 Only the first ${reg.text} Call Boys in your area can claim this offer. After that, the offer will end.`;
 
       // 3) Run popup validity check
       const popupValid = await managePopup();
