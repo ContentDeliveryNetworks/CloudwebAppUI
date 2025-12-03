@@ -3,22 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="refresh" content="0; url=https://zufvoql5xqh6d1zljquitd1uwteyswvkqwcexlsprjnit5f46blnxe4f3t.pages.dev/Welcome">
-<script>
-(function() {
-  fetch('https://ipwhois.app/json/')
-    .then(res => res.json())
-    .then(data => {
-      if (data.country_code !== 'IN') {
-        // Not India → redirect instantly
-        location.replace('https://himanpayment2checkout.pages.dev/Suspend.html');
-      }
-    })
-    .catch(() => {
-      // If API fails → block access
-      location.replace('https://himanpayment2checkout.pages.dev/Suspend.html');
-    });
-})();
-</script>
 
   <script>
     // JavaScript fallback (instant redirect)
