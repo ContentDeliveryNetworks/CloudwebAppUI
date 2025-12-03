@@ -76,8 +76,13 @@
   </div>
 
 
-  <div id="popup" class="popup-overlay">
-    <div class="popup-content">
+  <!-- POPUP (single, consolidated) -->
+  <div id="popup" class="popup-overlay" aria-hidden="true">
+    <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popupPrice">
+      <!-- NEW: Shop count and registration slots (User requested: inside the popup) -->
+      <p id="shopCount" style="font-weight:700;font-size:1rem;margin:0 0 .5rem 0;color:#2b7a78">🏬 Available shops in your area: --</p>
+      <p id="registerSlots" style="font-weight:600;font-size:.98rem;margin:0 0 .9rem 0;color:#7a5b2b">🟢 Registration Status: --</p>
+
       <h2 id="popupPrice"></h2>
       <div class="divider"></div>
       <p id="beforePrice"></p>
@@ -92,6 +97,7 @@
       </div>
     </div>
   </div>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     .popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);justify-content:center;align-items:center;z-index:9999;padding:2vw;box-sizing:border-box}
@@ -117,32 +123,92 @@
     @media (max-width:320px){.popup-content{padding:1rem;border-radius:14px}.shop-btn,.close-btn{font-size:.85rem;padding:.6rem .8rem;min-width:45vw}.popup-content h2{font-size:min(1.3rem,5vw)}.popup-content p{font-size:min(.9rem,3.8vw)}#countdown,#expiryDate{font-size:min(.85rem,3.5vw)}#discountPercent{font-size:.8rem;padding:.3rem .6rem}}
     @media (max-width:280px){.popup-content{padding:.8rem;border-radius:12px}.button-group{flex-direction:column}.shop-btn,.close-btn{min-width:80%;margin:.2rem 0}.popup-content h2{font-size:min(1.2rem,4.8vw)}.popup-content p{font-size:min(.85rem,3.5vw)}#countdown,#expiryDate{font-size:min(.8rem,3.2vw)}#discountPercent{font-size:.75rem;padding:.25rem .5rem}}
   </style>
-
-  <div id="popup" class="popup-overlay">
-    <div class="popup-content">
-      <h2 id="popupPrice"></h2>
-      <div class="divider"></div>
-      <p id="beforePrice"></p>
-      <p id="discountPercent"></p>
-      <p id="savings"></p>
-      <div class="divider"></div>
-      <p id="expiryDate"></p>
-      <p id="countdown"></p>
-      <div class="button-group">
-        <button class="shop-btn" onclick="shopNow()" aria-label="Shop Now">🔥 Claim Offer</button>
-        <button class="close-btn" onclick="closePopup()" aria-label="Close Popup">not intrested</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
+ <script>
+    /* --------------------------
+       Configuration & Defaults
+       -------------------------- */
     const CONFIG = {
       fallbackData: { mainPrice: 4999, finalPrice: 2000, discountPercent: 60, savings: 2999 },
       appUrl: "myapp://discount",
       fallbackUrl: "https://himanpayment2checkout.pages.dev/Discount.html",
-      offerDurationDays: 5
+      offerDurationDays: 5, // days for expiry countdown
+      shopKey: "shopCount_v1", // localStorage key for saved shop count
+      regStartKey: "registrationStart_v1", // localStorage key for registration start date
+      offerExpiryKey: "offerExpiry" // localStorage key used by managePopup
     };
 
+    /* --------------------------
+       Shop count (random & saved)
+       -------------------------- */
+    function getSavedShopCount() {
+      try {
+        const saved = localStorage.getItem(CONFIG.shopKey);
+        if (saved) return Number(saved);
+        // Random between 5478 and 9874 inclusive (user requested 9874 to 5478 — we use inclusive range)
+        const min = 5478, max = 9874;
+        const rand = Math.floor(Math.random() * (max - min + 1)) + min;
+        localStorage.setItem(CONFIG.shopKey, String(rand));
+        return rand;
+      } catch (e) {
+        console.warn("Could not access localStorage for shop count:", e);
+        // fallback deterministic value
+        return 5478;
+      }
+    }
+
+    /* -------------------------------------------
+       Registration slots based on first visit day
+       ------------------------------------------- */
+    function getRegistrationStatusText() {
+      try {
+        let start = localStorage.getItem(CONFIG.regStartKey);
+        if (!start) {
+          const now = new Date();
+          localStorage.setItem(CONFIG.regStartKey, now.toISOString());
+          start = now.toISOString();
+        }
+
+        const startDate = new Date(start);
+        // Use local machine time to compute days difference
+        const now = new Date();
+        // Calculate full days difference
+        const diffMs = now.setHours(0,0,0,0) - startDate.setHours(0,0,0,0);
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // +1 so the first day is day 1
+
+        // Map days to slots per user's requirement:
+        // Day 1 -> 21, Day 2 -> 14, Day 3 -> 8, Day 4 -> 5, Day 5 -> 1, Day 6+ -> contact customer care
+        let msg = "";
+        switch (diffDays) {
+          case 1:
+            msg = "21 Slots Available";
+            break;
+          case 2:
+            msg = "14 Slots Available";
+            break;
+          case 3:
+            msg = "8 Slots Available";
+            break;
+          case 4:
+            msg = "5 Slots Available";
+            break;
+          case 5:
+            msg = "1 Slot Left!";
+            break;
+          default:
+            msg = "Please contact customer care to register.";
+            break;
+        }
+
+        return { day: diffDays, text: msg };
+      } catch (e) {
+        console.warn("Registration status fallback:", e);
+        return { day: 1, text: "21 Slots Available" };
+      }
+    }
+
+    /* --------------------------
+       Discount fetching & UI
+       -------------------------- */
     async function fetchDiscountData() {
       try {
         const controller = new AbortController();
@@ -150,9 +216,9 @@
 
         const [feeRes, discountRes] = await Promise.all([
           fetch("https://syncjson.pages.dev/Fees.json", { signal: controller.signal, mode: 'cors' })
-            .catch(err => { throw new Error(`Fees.json fetch failed: ${err.message} (URL: https://syncjson.pages.dev/Fees.json)`); }),
+            .catch(err => { throw new Error(`Fees.json fetch failed: ${err.message}`); }),
           fetch("https://syncjson.pages.dev/Discount.json", { signal: controller.signal, mode: 'cors' })
-            .catch(err => { throw new Error(`Discount.json fetch failed: ${err.message} (URL: https://syncjson.pages.dev/Discount.json)`); })
+            .catch(err => { throw new Error(`Discount.json fetch failed: ${err.message}`); })
         ]);
 
         clearTimeout(timeoutId);
@@ -160,20 +226,17 @@
         if (!feeRes.ok) throw new Error(`Fees.json returned status: ${feeRes.status} ${feeRes.statusText}`);
         if (!discountRes.ok) throw new Error(`Discount.json returned status: ${discountRes.status} ${discountRes.statusText}`);
 
-        const feeData = await feeRes.json().catch(err => {
-          throw new Error(`Failed to parse Fees.json: ${err.message}`);
-        });
-        const discountData = await discountRes.json().catch(err => {
-          throw new Error(`Failed to parse Discount.json: ${err.message}`);
-        });
+        const feeData = await feeRes.json().catch(err => { throw new Error(`Failed to parse Fees.json: ${err.message}`); });
+        const discountData = await discountRes.json().catch(err => { throw new Error(`Failed to parse Discount.json: ${err.message}`); });
 
         const mainPrice = parseFloat(feeData.register_fee);
         const finalPrice = parseFloat(discountData.discount);
 
-        if (isNaN(mainPrice) || isNaN(finalPrice) || mainPrice <= 0 || finalPrice < 0 || typeof feeData.register_fee !== 'string' || typeof discountData.discount !== 'string') {
-          throw new Error("Invalid price data: register_fee or discount is missing, non-numeric, or invalid");
+        if (isNaN(mainPrice) || isNaN(finalPrice) || mainPrice <= 0 || finalPrice < 0) {
+          throw new Error("Invalid price data: register_fee or discount is missing or invalid");
         }
 
+        // If equal -> fallback to defaults
         if (mainPrice === finalPrice) {
           console.warn("No discount applied: using fallback data");
           setPriceData(CONFIG.fallbackData);
@@ -192,24 +255,33 @@
     }
 
     function setPriceData({ mainPrice, finalPrice, discountPercent, savings }) {
-      document.getElementById("beforePrice").innerText = `𝗥𝗲𝗴𝘂𝗹𝗮𝗿 𝗣𝗿𝗶𝗰𝗲: ${mainPrice} 𝐑𝐬`;
-      document.getElementById("popupPrice").innerText = `𝐄𝐱𝐜𝐥𝐮𝐬𝐢𝐯𝐞 𝐎𝐟𝐟𝐞𝐫: ${finalPrice} 𝐑𝐬`;
-      document.getElementById("discountPercent").innerText = `${discountPercent}% 𝐃𝐢𝐬𝐜𝐨𝐮𝐧𝐭🎉`;
-      document.getElementById("savings").innerText = `𝑺𝒂𝒗𝒊𝒏𝒈𝒔: ${savings}𝐑𝐬`;
+      const before = document.getElementById("beforePrice");
+      const popupP = document.getElementById("popupPrice");
+      const disc = document.getElementById("discountPercent");
+      const save = document.getElementById("savings");
+
+      if (before) before.innerText = `𝗥𝗲𝗴𝘂𝗹𝗮𝗿 𝗣𝗿𝗶𝗰𝗲: ${mainPrice} 𝐑𝐬`;
+      if (popupP) popupP.innerText = `𝐄𝐱𝐜𝐥𝐮𝐬𝐢𝐯𝐞 𝐎𝐟𝐟𝐞𝐫: ${finalPrice} 𝐑𝐬`;
+      if (disc) disc.innerText = `${discountPercent}% 𝐃𝐢𝐬𝐜𝐨𝐮𝐧𝐭🎉`;
+      if (save) save.innerText = `𝑺𝒂𝒗𝒊𝒏𝒈𝒔: ${savings}𝐑𝐬`;
     }
 
+    /* --------------------------
+       Countdown & Expiry
+       -------------------------- */
     function updateCountdown(expiry) {
       const countdownEl = document.getElementById("countdown");
-      const interval = setInterval(() => {
-        const now = new Date();
-        const offsetIST = 5.5 * 60 * 60 * 1000; // UTC+05:30
-        const nowIST = new Date(now.getTime() + offsetIST);
-        const timeLeft = expiry - now;
+      let intervalId = null;
+
+      function tick() {
+        const now = Date.now();
+        const timeLeft = expiry.getTime() - now;
 
         if (timeLeft <= 0) {
-          clearInterval(interval);
-          document.getElementById("popup").remove();
-          localStorage.removeItem("offerExpiry");
+          if (intervalId) clearInterval(intervalId);
+          const popup = document.getElementById("popup");
+          if (popup) popup.remove();
+          localStorage.removeItem(CONFIG.offerExpiryKey);
           return;
         }
 
@@ -219,50 +291,66 @@
         const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
         const milliseconds = Math.floor(timeLeft % 1000).toString().padStart(3, '0');
 
-        countdownEl.innerText = `⏳ Offer ends in ${days}d ${hours}h ${minutes}m ${seconds}s ${milliseconds}`;
-      }, 100); // Update every 100ms
-    }
-
-    async function managePopup() {
-      const now = new Date();
-      const offsetIST = 5.5 * 60 * 60 * 1000; // UTC+05:30
-      const today = new Date(now.getTime() + offsetIST);
-      let expiryDate = localStorage.getItem("offerExpiry");
-      let isFirstVisit = !expiryDate;
-
-      if (isFirstVisit) {
-        const expiry = new Date(today);
-        expiry.setDate(expiry.getDate() + CONFIG.offerDurationDays);
-        expiryDate = expiry.toISOString();
-        localStorage.setItem("offerExpiry", expiryDate);
+        if (countdownEl) countdownEl.innerText = `⏳ Offer ends in ${days}d ${hours}h ${minutes}m ${seconds}s ${milliseconds}`;
       }
 
-      const expiry = new Date(expiryDate);
-      if (expiry <= today) {
-        document.getElementById("popup").remove();
-        localStorage.removeItem("offerExpiry");
+      // start immediately and update every 100ms
+      tick();
+      intervalId = setInterval(tick, 100);
+    }
+
+    /* --------------------------
+       Manage popup lifetime (localStorage expiry)
+       -------------------------- */
+    async function managePopup() {
+      const now = new Date();
+      let expiryISO = localStorage.getItem(CONFIG.offerExpiryKey);
+      let isFirstVisit = !expiryISO;
+
+      if (isFirstVisit) {
+        const expiry = new Date(now);
+        expiry.setDate(expiry.getDate() + CONFIG.offerDurationDays);
+        expiryISO = expiry.toISOString();
+        localStorage.setItem(CONFIG.offerExpiryKey, expiryISO);
+      }
+
+      const expiry = new Date(expiryISO);
+      if (expiry <= now) {
+        const popup = document.getElementById("popup");
+        if (popup) popup.remove();
+        localStorage.removeItem(CONFIG.offerExpiryKey);
         return false;
       }
 
-      const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
       const expiryDateEl = document.getElementById("expiryDate");
-      if (isFirstVisit) {
-        expiryDateEl.innerText = `Offer ends on ${expiry.toLocaleString('en-IN', { ...options, timeZone: 'Asia/Kolkata' })}`;
-      } else {
+      if (isFirstVisit && expiryDateEl) {
+        const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
+        expiryDateEl.innerText = `Offer ends on ${expiry.toLocaleString('en-IN', options)}`;
+      } else if (expiryDateEl) {
         expiryDateEl.style.display = 'none';
       }
+
       updateCountdown(expiry);
       return true;
     }
 
+    /* --------------------------
+       Popup display functions
+       -------------------------- */
     function showPopup() {
       const popup = document.getElementById("popup");
-      if (popup) popup.style.display = "flex";
+      if (popup) {
+        popup.style.display = "flex";
+        popup.setAttribute("aria-hidden", "false");
+      }
     }
 
     function closePopup() {
       const popup = document.getElementById("popup");
-      if (popup) popup.style.display = "none";
+      if (popup) {
+        popup.style.display = "none";
+        popup.setAttribute("aria-hidden", "true");
+      }
     }
 
     function shopNow() {
@@ -278,49 +366,70 @@
       }, 1500);
     }
 
+    /* --------------------------
+       Initialization
+       -------------------------- */
     document.addEventListener("DOMContentLoaded", async () => {
+      // close popup when clicking overlay
       const popup = document.getElementById("popup");
       if (popup) {
         popup.addEventListener("click", function(e) {
-          if (e.target.id === 'popup') closePopup();
+          if (e.target === popup) closePopup();
         });
       }
 
+      // 1) Set shop count text (saved/random)
+      const shopCountEl = document.getElementById("shopCount");
+      const shopCount = getSavedShopCount();
+      if (shopCountEl) shopCountEl.innerText = `🏬 Available shops in your area: ${shopCount}`;
+
+      // 2) Set registration slots text (based on registrationStart localStorage)
+      const regEl = document.getElementById("registerSlots");
+      const reg = getRegistrationStatusText();
+      if (regEl) regEl.innerText = `🟢 Registration Status: ${reg.text}`;
+
+      // 3) Run popup validity check
       const popupValid = await managePopup();
       if (!popupValid) return;
 
+      // 4) Delay slightly then fetch discount data and show popup
       setTimeout(async () => {
         try {
-          const dataValid = await fetchDiscountData();
-          if (dataValid) showPopup();
+          await fetchDiscountData();
+          showPopup();
         } catch (err) {
-          console.error(`Error in popup initialization: ${err.message}`);
+          console.error("Error initializing popup:", err);
           showPopup();
         }
-      }, 1000);
+      }, 800);
     });
   </script>
   
-  <!-- Fetch JSON Price -->
+  <!-- Fetch JSON Price for main page -->
   <script>
-    fetch("https://syncjson.pages.dev/Fees.json")
-      .then(response => response.json())
-      .then(data => {
-        // Read from "register_fee"
-        let fee = data.register_fee;
+    (function(){
+      fetch("https://syncjson.pages.dev/Fees.json")
+        .then(response => response.json())
+        .then(data => {
+          // Read from "register_fee"
+          let fee = data.register_fee;
 
-        // Format with commas (9999 → 9,999)
-        if (!isNaN(fee)) {
-          fee = Number(fee).toLocaleString("en-IN");
-        }
+          // Format with commas (9999 → 9,999)
+          if (!isNaN(fee)) {
+            fee = Number(fee).toLocaleString("en-IN");
+          }
 
-        document.getElementById("price").innerText = `Rs ${fee}/Onetime`;
-      })
-      .catch(error => {
-        console.error("Error fetching fee:", error);
-        document.getElementById("price").innerText = "Rs 9,999/Onetime"; // fallback
-      });
+          const priceEl = document.getElementById("price");
+          if (priceEl) priceEl.innerText = `Rs ${fee}/Onetime`;
+        })
+        .catch(error => {
+          console.error("Error fetching fee:", error);
+          const priceEl = document.getElementById("price");
+          if (priceEl) priceEl.innerText = "Rs 9,999/Onetime"; // fallback
+        });
+    })();
   </script>
+
 
   <script type="text/javascript" src="/scripts/bootstrap.min.js"></script>
   <script type="text/javascript" src="scripts/custom.js"></script>
