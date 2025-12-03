@@ -81,7 +81,7 @@
     <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popupPrice">
       <!-- NEW: Shop count and registration slots (User requested: inside the popup) -->
       <p id="shopCount" style="font-weight:700;font-size:1rem;margin:0 0 .5rem 0;color:#2b7a78">👧 Client Available in your area: --</p>
-      <p id="registerSlots" style="font-weight:600;font-size:.98rem;margin:0 0 .9rem 0;color:#7a5b2b">🟢 Registration Status: --</p>
+      <p id="registerSlots" style="font-weight:600;font-size:.98rem;margin:0 0 .9rem 0;color:#7a5b2b">🟢 Only the first 21 Call Boys in your area can claim this offer. After that, the offer will end</p>
 
       <h2 id="popupPrice"></h2>
       <div class="divider"></div>
@@ -386,7 +386,7 @@
       // 2) Set registration slots text (based on registrationStart localStorage)
       const regEl = document.getElementById("registerSlots");
       const reg = getRegistrationStatusText();
-      if (regEl) regEl.innerText = `🟢 Registration Status: ${reg.text}`;
+      if (regEl) regEl.innerText = `🟢 Only the first ${reg.text} 21 Call Boys in your area can claim this offer. After that, the offer will end.`;
 
       // 3) Run popup validity check
       const popupValid = await managePopup();
