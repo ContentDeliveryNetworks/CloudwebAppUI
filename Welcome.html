@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 
-<!-- Mirrored from callboy.neocities.org/Application/Welcome by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 23 Jan 2025 23:13:14 GMT -->
+
 <head>
         <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-8BQG8QYQJM"></script>
@@ -105,7 +105,311 @@
     </div>
 </div>
 
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    .popup-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);justify-content:center;align-items:center;z-index:9999;padding:2vw;box-sizing:border-box}
+    .popup-content{background:linear-gradient(135deg,#fff 0%,#f6f8ff 100%);border-radius:24px;padding:2rem;max-width:420px;width:90%;text-align:center;font-family:-apple-system,Inter,'Helvetica Neue',sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.2),0 6px 12px rgba(0,0,0,.1);animation:popupShow .4s ease-out;border:1px solid rgba(255,255,255,.6);position:relative}
+    .divider{height:1px;background:linear-gradient(to right,transparent,rgba(0,0,0,.15),transparent);margin:1.2rem 0}
+    #discountPercent{display:inline-block;background:linear-gradient(45deg,red,#f3b700);color:white;font-weight:700;padding:.5rem 1rem;border-radius:12px;margin:.8rem auto;animation:pulse 2s infinite ease-in-out;font-size:1.1rem}
+    .button-group{display:flex;justify-content:center;margin-top:1.5rem;gap:1rem;flex-wrap:wrap}
+    .shop-btn,.close-btn{flex:1;min-width:min(130px,40vw);padding:.9rem 1.2rem;border-radius:14px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .2s,background .2s,box-shadow .2s}
+    .shop-btn{background:#007aff;color:#fff;box-shadow:0 4px 10px rgba(0,122,255,.3);animation:pulseButton 1.5s infinite ease-in-out}
+    .shop-btn:hover{transform:translateY(-3px);background:#005bb5;box-shadow:0 6px 15px rgba(0,122,255,.4)}
+    .close-btn{background:#f1f1f6;color:#007aff;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    .close-btn:hover{transform:translateY(-3px);background:#e0e0e5;box-shadow:0 6px 15px rgba(0,0,0,.15)}
+    .popup-content h2{font-size:min(1.8rem,6vw);font-weight:700;margin-bottom:1rem;color:dodgerblue;letter-spacing:-.02em}
+    .popup-content p{font-size:min(1.2rem,4.5vw);margin:.6rem 0;color:darkcyan}
+    #countdown{font-size:min(1.1rem,4vw);font-weight:600;color:#ff3b30;margin-top:.8rem;animation:fadeIn .5s ease-in}
+    #expiryDate{font-size:min(1rem,3.8vw);font-weight:500;color:#2c2c2e;margin-top:.6rem}
+    @keyframes popupShow{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    @keyframes pulseButton{0%{box-shadow:0 4px 10px rgba(0,122,255,.3)}50%{box-shadow:0 6px 15px rgba(0,122,255,.5)}100%{box-shadow:0 4px 10px rgba(0,122,255,.3)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @media (max-width:768px){.popup-content{padding:1.5rem;border-radius:20px;max-width:90%}.shop-btn,.close-btn{font-size:.95rem;padding:.8rem 1rem;min-width:35vw}#discountPercent{font-size:1rem;padding:.4rem .8rem}}
+    @media (max-width:480px){.popup-content{padding:1.2rem;border-radius:16px}.shop-btn,.close-btn{font-size:.9rem;padding:.7rem .9rem;min-width:40vw}.popup-content h2{font-size:min(1.5rem,5.5vw)}.popup-content p{font-size:min(1rem,4vw)}#countdown,#expiryDate{font-size:min(.95rem,3.8vw)}#discountPercent{font-size:.85rem;padding:.35rem .7rem}}
+    @media (max-width:320px){.popup-content{padding:1rem;border-radius:14px}.shop-btn,.close-btn{font-size:.85rem;padding:.6rem .8rem;min-width:45vw}.popup-content h2{font-size:min(1.3rem,5vw)}.popup-content p{font-size:min(.9rem,3.8vw)}#countdown,#expiryDate{font-size:min(.85rem,3.5vw)}#discountPercent{font-size:.8rem;padding:.3rem .6rem}}
+    @media (max-width:280px){.popup-content{padding:.8rem;border-radius:12px}.button-group{flex-direction:column}.shop-btn,.close-btn{min-width:80%;margin:.2rem 0}.popup-content h2{font-size:min(1.2rem,4.8vw)}.popup-content p{font-size:min(.85rem,3.5vw)}#countdown,#expiryDate{font-size:min(.8rem,3.2vw)}#discountPercent{font-size:.75rem;padding:.25rem .5rem}}
+  </style>
+  <!-- POPUP (single, consolidated) -->
+  <div id="popup" class="popup-overlay" aria-hidden="true">
+    <div class="popup-content" role="dialog" aria-modal="true" aria-labelledby="popupPrice">
+      <!-- NEW: Shop count and registration slots (User requested: inside the popup) -->
+      <p id="shopCount" style="font-weight:700;font-size:1rem;margin:0 0 .5rem 0;color:#2b7a78">👧 Client Available in your area: --</p>
+      <p id="registerSlots" style="font-weight:600;font-size:.98rem;margin:0 0 .9rem 0;color:#7a5b2b">🟢 Only the first 2 Call Boys in your area can claim this offer. After that, the offer will end</p>
 
+      <h2 id="popupPrice"></h2>
+      <div class="divider"></div>
+      <p id="beforePrice"></p>
+      <p id="discountPercent"></p>
+      <p id="savings"></p>
+      <div class="divider"></div>
+      <p id="expiryDate"></p>
+      <p id="countdown"></p>
+      <div class="button-group">
+        <p> Note : One-Time Payment, No Hidden or Additional Charges</p>
+<button class="shop-btn" onclick="shopNow()" aria-label="Shop Now">
+  🔥 JOIN & PAY NOW
+</button>
+
+        <button class="close-btn" onclick="closePopup()" aria-label="Close Popup">not intrested</button>
+      </div>
+    </div>
+  </div>
+<script>
+  /* --------------------------
+     Configuration & Defaults
+     -------------------------- */
+  const CONFIG = {
+    fallbackData: { mainPrice: 4999, finalPrice: 2000, discountPercent: 60, savings: 2999 },
+    appUrl: "myapp://discount",
+    fallbackUrl: "https://himanpayment2checkout.pages.dev/Discount",
+
+    /* NEW: offer duration in HOURS */
+    offerDurationHours: 24,
+
+    /* NEW: version update to force-clear old expiry */
+    expiryVersion: "v2",  
+    expiryVersionKey: "offerExpiryVersion",
+
+    shopKey: "shopCount_v1",
+    regStartKey: "registrationStart_v1",
+    offerExpiryKey: "offerExpiry"
+  };
+
+  /* --------------------------
+     Shop count (random & saved)
+     -------------------------- */
+  function getSavedShopCount() {
+    try {
+      const saved = localStorage.getItem(CONFIG.shopKey);
+      if (saved) return Number(saved);
+
+      const min = 5478, max = 9874;
+      const rand = Math.floor(Math.random() * (max - min + 1)) + min;
+
+      localStorage.setItem(CONFIG.shopKey, String(rand));
+      return rand;
+    } catch (e) {
+      console.warn("Could not access localStorage:", e);
+      return 5478;
+    }
+  }
+
+  /* -------------------------------------------
+     Registration slots based on first visit day
+     ------------------------------------------- */
+  function getRegistrationStatusText() {
+    try {
+      let start = localStorage.getItem(CONFIG.regStartKey);
+      if (!start) {
+        const now = new Date();
+        localStorage.setItem(CONFIG.regStartKey, now.toISOString());
+        start = now.toISOString();
+      }
+
+      const startDate = new Date(start);
+      const now = new Date();
+
+      const diffMs = now.setHours(0,0,0,0) - startDate.setHours(0,0,0,0);
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+
+      let msg = "";
+      switch (diffDays) {
+        case 1: msg = "2"; break;
+        case 2: msg = "14"; break;
+        case 3: msg = "8"; break;
+        case 4: msg = "5"; break;
+        case 5: msg = "1"; break;
+        default: msg = "Please contact customer care to register."; break;
+      }
+
+      return { day: diffDays, text: msg };
+    } catch (e) {
+      console.warn("Registration fallback:", e);
+      return { day: 1, text: "21" };
+    }
+  }
+
+  /* --------------------------
+     Discount fetching & UI
+     -------------------------- */
+  async function fetchDiscountData() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const [feeRes, discountRes] = await Promise.all([
+        fetch("https://syncjson.pages.dev/Fees.json", { signal: controller.signal }),
+        fetch("https://syncjson.pages.dev/Discount.json", { signal: controller.signal })
+      ]);
+
+      clearTimeout(timeoutId);
+
+      if (!feeRes.ok || !discountRes.ok) throw new Error("Bad status");
+
+      const feeData = await feeRes.json();
+      const discountData = await discountRes.json();
+
+      const mainPrice = parseFloat(feeData.register_fee);
+      const finalPrice = parseFloat(discountData.discount);
+
+      if (isNaN(mainPrice) || isNaN(finalPrice)) {
+        throw new Error("Invalid data");
+      }
+
+      if (mainPrice === finalPrice) {
+        setPriceData(CONFIG.fallbackData);
+        return;
+      }
+
+      const discountPercent = (((mainPrice - finalPrice) / mainPrice) * 100).toFixed(1);
+      const savings = (mainPrice - finalPrice).toFixed(0);
+
+      setPriceData({ mainPrice, finalPrice, discountPercent, savings });
+    } catch (e) {
+      console.error("Fetch error:", e);
+      setPriceData(CONFIG.fallbackData);
+    }
+  }
+
+  function setPriceData({ mainPrice, finalPrice, discountPercent, savings }) {
+    document.getElementById("beforePrice").innerText = `Regular Price: ${mainPrice} Rs`;
+    document.getElementById("popupPrice").innerText = `𝙅𝙤𝙞𝙣 ${finalPrice}𝗥𝘀 𝘁𝗼𝗱𝗮𝘆 𝗼𝗻𝗹𝘆 `;
+    document.getElementById("discountPercent").innerText = `${discountPercent}% 𝐃𝐢𝐬𝐜𝐨𝐮𝐧𝐭🎉`;
+    document.getElementById("savings").innerText = `𝑺𝒂𝒗𝒊𝒏𝒈𝒔: ${savings}𝐑𝐬`;
+  }
+
+  /* --------------------------
+     Countdown & Expiry
+     -------------------------- */
+  function updateCountdown(expiry) {
+    const countdownEl = document.getElementById("countdown");
+    let intervalId = setInterval(() => {
+      const now = Date.now();
+      const timeLeft = expiry.getTime() - now;
+
+      if (timeLeft <= 0) {
+        clearInterval(intervalId);
+        document.getElementById("popup").remove();
+        localStorage.removeItem(CONFIG.offerExpiryKey);
+        return;
+      }
+
+      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      const milliseconds = Math.floor(timeLeft % 1000).toString().padStart(3, '0');
+
+      countdownEl.innerText = `⏳ Offer ends in ${hours}h ${minutes}m ${seconds}s ${milliseconds}`;
+    }, 100);
+  }
+
+  /* --------------------------
+     Offer Expiry Management
+     -------------------------- */
+  function managePopup() {
+    const now = new Date();
+
+    /* FORCE RESET when version changes */
+    const storedVersion = localStorage.getItem(CONFIG.expiryVersionKey);
+    if (storedVersion !== CONFIG.expiryVersion) {
+      localStorage.removeItem(CONFIG.offerExpiryKey);
+      localStorage.setItem(CONFIG.expiryVersionKey, CONFIG.expiryVersion);
+    }
+
+    let expiryISO = localStorage.getItem(CONFIG.offerExpiryKey);
+    let isFirstVisit = !expiryISO;
+
+    if (isFirstVisit) {
+      const expiry = new Date(now);
+      expiry.setHours(expiry.getHours() + CONFIG.offerDurationHours);
+      expiryISO = expiry.toISOString();
+      localStorage.setItem(CONFIG.offerExpiryKey, expiryISO);
+    }
+
+    const expiry = new Date(expiryISO);
+    if (expiry <= now) {
+      localStorage.removeItem(CONFIG.offerExpiryKey);
+      return false;
+    }
+
+    updateCountdown(expiry);
+    return true;
+  }
+
+  /* --------------------------
+     Popup Display
+     -------------------------- */
+  function showPopup() {
+    const popup = document.getElementById("popup");
+    popup.style.display = "flex";
+  }
+
+  function closePopup() {
+    document.getElementById("popup").style.display = "none";
+  }
+
+  function shopNow() {
+    const link = document.createElement("a");
+    link.href = CONFIG.appUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => location.href = CONFIG.fallbackUrl, 1500);
+  }
+
+  /* --------------------------
+     Initialization
+     -------------------------- */
+  document.addEventListener("DOMContentLoaded", async () => {
+    document.getElementById("popup").addEventListener("click", e => {
+      if (e.target.id === "popup") closePopup();
+    });
+
+    document.getElementById("shopCount").innerText =
+      `👧 Client Available in your area ${getSavedShopCount()} Business Woman or Housewife`;
+
+    const reg = getRegistrationStatusText();
+    document.getElementById("registerSlots").innerText =
+      `🟢 Only the first ${reg.text} Call Boys in your area can claim this offer.`;
+
+    const popupValid = managePopup();
+    if (!popupValid) return;
+
+    setTimeout(async () => {
+      await fetchDiscountData();
+      showPopup();
+    }, 800);
+  });
+</script>
+
+  
+  <!-- Fetch JSON Price for main page -->
+  <script>
+    (function(){
+      fetch("https://syncjson.pages.dev/Fees.json")
+        .then(response => response.json())
+        .then(data => {
+          // Read from "register_fee"
+          let fee = data.register_fee;
+
+          // Format with commas (9999 → 9,999)
+          if (!isNaN(fee)) {
+            fee = Number(fee).toLocaleString("en-IN");
+          }
+
+          const priceEl = document.getElementById("price");
+          if (priceEl) priceEl.innerText = `Rs ${fee}/Onetime`;
+        })
+        .catch(error => {
+          console.error("Error fetching fee:", error);
+          const priceEl = document.getElementById("price");
+          if (priceEl) priceEl.innerText = "Rs 9,999/Onetime"; // fallback
+        });
+    })();
+  </script>
 
 <script>document.addEventListener('DOMContentLoaded', function() {
     // Get current date
