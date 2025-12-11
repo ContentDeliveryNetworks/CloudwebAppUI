@@ -247,10 +247,10 @@
   }
 
   function setPriceData({ mainPrice, finalPrice, discountPercent, savings }) {
-    document.getElementById("beforePrice").innerText = `Regular Price: ${mainPrice} Rs`;
-    document.getElementById("popupPrice").innerText = `𝙅𝙤𝙞𝙣 ${finalPrice}𝗥𝘀 𝘁𝗼𝗱𝗮𝘆 𝗼𝗻𝗹𝘆 `;
-    document.getElementById("discountPercent").innerText = `${discountPercent}% 𝐃𝐢𝐬𝐜𝐨𝐮𝐧𝐭🎉`;
-    document.getElementById("savings").innerText = `𝑺𝒂𝒗𝒊𝒏𝒈𝒔: ${savings}𝐑𝐬`;
+    document.getElementById("beforePrice").innerText = `Before Discount: ₹${mainPrice}`;
+    document.getElementById("popupPrice").innerText = `Join today for just ₹${finalPrice}!`;
+    document.getElementById("discountPercent").innerText = `Today ${discountPercent}% Discount!🎉`;
+    document.getElementById("savings").innerText = `Save ₹${savings}instantly!`;
   }
 
   /* --------------------------
