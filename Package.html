@@ -194,7 +194,7 @@
         case 3: msg = "8"; break;
         case 4: msg = "5"; break;
         case 5: msg = "1"; break;
-        default: msg = "Please contact customer care to register."; break;
+        default: msg = "1"; break;
       }
 
       return { day: diffDays, text: msg };
@@ -342,7 +342,7 @@
     });
 
     document.getElementById("shopCount").innerText =
-      `👧 Client Available in your area ${getSavedShopCount()} Business Woman or Housewife`;
+      ` 👧 Available in your area ${getSavedShopCount()} clients`;
 
     const reg = getRegistrationStatusText();
     document.getElementById("registerSlots").innerText =
