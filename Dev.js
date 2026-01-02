@@ -1,4 +1,4 @@
-//
+/*
 (function(){"use strict";const THRESHOLD=0.72;const TIMEOUT_MS=900;async function sha256Hex(str){const data=new TextEncoder().encode(str);const hashBuffer=await crypto.subtle.digest("SHA-256",data);const bytes=new Uint8Array(hashBuffer);return Array.from(bytes).map(b=>b.toString(16).padStart(2,"0")).join("")}
 function getWebGLRenderer(){try{const canvas=document.createElement("canvas");const gl=canvas.getContext("webgl")||canvas.getContext("experimental-webgl");if(!gl)return"";const debugInfo=gl.getExtension("WEBGL_debug_renderer_info");if(!debugInfo)return"";const renderer=gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)||"";return String(renderer).toLowerCase()}catch(e){return""}}
 async function getCanvasFingerprint(){try{const canvas=document.createElement("canvas");canvas.width=280;canvas.height=60;const ctx=canvas.getContext("2d");ctx.textBaseline="top";ctx.font="14px 'Arial'";ctx.fillStyle="#f60";ctx.fillRect(0,0,280,60);ctx.fillStyle="#069";ctx.fillText("android-check - 𝒜",8,8);ctx.fillStyle="rgba(102, 200, 0, 0.7)";ctx.fillText("⟂",200,20);ctx.beginPath();ctx.arc(50,40,6,0,Math.PI*2);ctx.fill();const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;let s="";for(let i=0;i<data.length;i+=10)s+=data[i]+",";return await sha256Hex(s)}catch(e){return""}}
@@ -16,5 +16,4 @@ async function gate(){const ua=(navigator.userAgent||"").toLowerCase();if(!ua.in
 const evalPromise=evaluate();let evalResult;try{evalResult=await Promise.race([evalPromise,new Promise(resolve=>setTimeout(()=>resolve({results:null,score:0}),TIMEOUT_MS+200))])}catch(e){evalResult={results:null,score:0}}
 const pass=evalResult.score>=THRESHOLD;if(!pass){window.location.replace("/nonsup.html")}else{}}
 document.addEventListener("DOMContentLoaded",()=>{setTimeout(gate,60)})})()
-
-//
+*/
